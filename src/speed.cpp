@@ -1,0 +1,73 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <cerrno>
+#include "token_type.hpp"
+#include "errors.hpp"
+#include "scanner.hpp"
+
+using namespace std;
+
+void runFile(char *filename);
+void runREPL();
+string get_file_contents(char *filename);
+
+int main(int argc, char **argv) {
+    if(argc > 2) {
+        cout << "Usage: speed [file]";
+        return 64; // exit code 64: incorrect command usage
+    }
+    else if(argc == 2) {
+        runFile(argv[1]);
+    }
+    else {
+        runREPL();
+    }
+
+    return 0;
+}
+
+void runREPL() {
+    string x = "";
+
+    while(x != "exit") {
+        cout << ">>>"; 
+        cin >> x;
+        cout << x << "\n";
+    }
+
+}
+
+void runFile(char *filename) {
+    string contents = get_file_contents(filename);
+    Scanner sc(contents);
+    vector<Token> tokens = sc.scan_file_contents();
+    //parse_file_contents - syntax analysis
+    //execute_code
+}
+
+string get_file_contents(char *filename) {
+    ifstream in;
+
+    try {
+        in = ifstream(filename, ios::in | ios::binary);
+    }
+    catch(...) {
+        throw FILE_NOT_FOUND_EXCEPTION(filename);
+    }
+
+    if(in) {
+        string contents;
+        in.seekg(0, ios::end);
+        contents.resize(in.tellg());
+        in.seekg(0, ios::beg);
+        in.read(&contents[0], contents.size());
+        in.close();
+        return contents;
+    }
+    else {
+        throw FILE_NOT_FOUND_EXCEPTION(string(filename));
+    }
+
+    return ""; 
+}
