@@ -128,3 +128,29 @@ void Scanner::add_single_char_token(TokenType type) {
     tokens.push_back(Token(type, line, cursor, std::string(1, contents[cursor])));
     cursor++;
 }
+
+void Scanner::add_string() {
+    int start = ++cursor; // first character in the string
+
+    while(cursor < length && contents[cursor] != '"') {
+        cursor++;
+    }
+
+    // cursor should now be at the closing quotation mark
+
+    if(cursor == length) {
+        throw UNTERMINATED_STRING_EXCEPTION();
+    }
+
+    std::string value = std::string(contents + start * sizeof(char), cursor - start);
+    tokens.push_back(Token(TokenType::STRING, line, cursor, value));
+    cursor++;
+}
+
+void Scanner::add_number() {
+
+}
+
+void Scanner::add_identifier() {
+
+}

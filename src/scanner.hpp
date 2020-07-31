@@ -2,6 +2,7 @@
 #define SCANNER_HPP
 
 #include "token.hpp"
+#include "errors.hpp"
 #include <vector>
 #include <string>
 
