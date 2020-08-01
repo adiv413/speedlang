@@ -1,6 +1,7 @@
 #include "scanner.hpp"
 
-Scanner::Scanner(std::string raw_contents) : contents(&*raw_contents.begin()), cursor(0), line(0), length(raw_contents.length()) {}
+Scanner::Scanner(std::string file, std::string raw_contents) 
+: contents(&*raw_contents.begin()), cursor(0), line(0), length(raw_contents.length()), line_begin(0), filename(file), errorOccurred(false) {}
 
 std::vector<Token> Scanner::scan_file_contents() {
 
@@ -20,6 +21,7 @@ std::vector<Token> Scanner::scan_file_contents() {
             case '\n':
                 line++;
                 cursor++;
+                line_begin = cursor;
                 break;
             
             // operators and brackets
@@ -41,7 +43,7 @@ std::vector<Token> Scanner::scan_file_contents() {
                 break;
             case '/':
                 if(check_next_character('=', TokenType::SLASH_EQUAL));
-                else if(cursor + 1 < length && contents[cursor + 1] == '/') while(contents[cursor] != '\n') cursor++; // comment case: "//"
+                else if(cursor + 1 < length && contents[cursor + 1] == '/') while(contents[cursor + 1] != '\n') cursor++; // comment case: "//"
                 else add_single_char_token(TokenType::SLASH);
                 break;
             case '%':
@@ -104,13 +106,19 @@ std::vector<Token> Scanner::scan_file_contents() {
             
             // literals and identifiers
 
+            case '\'':
             case '"':
                 add_string();
                 break;
 
             default:
-                
+                if('0' <= current && current <= '9') add_number();
+                else add_identifier();
         }
+    }
+
+    for(auto error : errors) {
+        error.print();
     }
 }
 
@@ -130,27 +138,62 @@ void Scanner::add_single_char_token(TokenType type) {
 }
 
 void Scanner::add_string() {
-    int start = ++cursor; // first character in the string
+    // strings can be made using either double or single quotes, but the starting quote has to match the ending quote
+    // for example, 'Hello, World!' is valid and "Hello, World!" is valid, but 'Hello, World!" and "Hello, World!' are not
 
-    while(cursor < length && contents[cursor] != '"') {
+    char quot_mark = contents[cursor]; 
+    int start = ++cursor; // first character in the string (not quotation mark)
+
+    while(cursor < length && contents[cursor] != quot_mark) {
         cursor++;
     }
 
     // cursor should now be at the closing quotation mark
 
     if(cursor == length) {
-        throw UNTERMINATED_STRING_EXCEPTION();
+        add_error("SyntaxError", "Unterminated string", start - 1);
     }
-
-    std::string value = std::string(contents + start * sizeof(char), cursor - start);
-    tokens.push_back(Token(TokenType::STRING, line, cursor, value));
-    cursor++;
+    else {
+        std::string value = std::string(contents + start * sizeof(char), cursor - start);
+        tokens.push_back(Token(TokenType::STRING, line, cursor, value));
+        cursor++;
+    }
 }
 
-void Scanner::add_number() {
+// used for parsing both doubles and ints
 
+void Scanner::add_number() {
+    bool isDouble = false;
+    int start = cursor;
+    char curr = contents[cursor];
+
+    while(cursor < length && ('0' <= curr && curr <= '9' || curr == '.')) {
+        if(curr == '.') isDouble = true;
+        curr = contents[++cursor];
+    }
+
+    if(isDouble) {
+        std::string val(contents + start * sizeof(char), cursor - start);
+        if(val[0] == '.') val = "0" + val; 
+        else if(val[val.length() - 1] == '.') val += "0";
+
+        tokens.push_back(Token(TokenType::DOUBLE, line, start, val));
+    }
+    else {
+        std::string val(contents + start * sizeof(char), cursor - start);
+        tokens.push_back(Token(TokenType::INT, line, start, val));
+    }
 }
 
 void Scanner::add_identifier() {
 
+}
+
+void Scanner::add_error(std::string e_type, std::string e_desc, int col) {
+    int line_end = line_begin;
+    while(line_end < length && contents[line_end] != '\n') line_end++;
+    std::string e_line(contents + line_begin * sizeof(char), line_end - line_begin);
+
+    errors.push_back(Error(e_type, e_line, e_desc, filename, line, col));
+    errorOccurred = true;
 }

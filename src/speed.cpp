@@ -3,13 +3,13 @@
 #include <string>
 #include <cerrno>
 #include "token_type.hpp"
-#include "errors.hpp"
+#include "exceptions.hpp"
 #include "scanner.hpp"
 
 using namespace std;
 
-void runFile(char *filename);
 void runREPL();
+void runFile(char *filename);
 string get_file_contents(char *filename);
 
 int main(int argc, char **argv) {
@@ -40,7 +40,7 @@ void runREPL() {
 
 void runFile(char *filename) {
     string contents = get_file_contents(filename);
-    Scanner sc(contents);
+    Scanner sc(string(filename), contents);
     vector<Token> tokens = sc.scan_file_contents();
     //parse_file_contents - syntax analysis
     //execute_code
