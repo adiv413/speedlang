@@ -1,7 +1,7 @@
 #include "scanner.hpp"
 
 Scanner::Scanner(std::string file, std::string raw_contents) 
-: contents(&*raw_contents.begin()), cursor(0), line(0), length(raw_contents.length()), line_begin(0), filename(file), errorOccurred(false) {}
+: contents(raw_contents), cursor(0), line(0), length(raw_contents.length()), line_begin(0), filename(file), errorOccurred(false) {}
 
 std::vector<Token> Scanner::scan_file_contents() {
 
@@ -37,8 +37,7 @@ std::vector<Token> Scanner::scan_file_contents() {
                 else add_single_char_token(TokenType::MINUS);
                 break;
             case '*':
-                if(check_next_character('*', TokenType::STAR_STAR));
-                else if(check_next_character('=', TokenType::STAR_EQUAL));
+                if(check_next_character('=', TokenType::STAR_EQUAL));
                 else add_single_char_token(TokenType::STAR);
                 break;
             case '/':
@@ -98,7 +97,8 @@ std::vector<Token> Scanner::scan_file_contents() {
                 add_single_char_token(TokenType::SEMICOLON);
                 break;
             case '.':
-                add_single_char_token(TokenType::DOT);
+                if(cursor + 1 < length && '0' <= contents[cursor + 1] && contents[cursor + 1] <= '9') add_number();
+                else add_single_char_token(TokenType::DOT);
                 break;
             case ',':
                 add_single_char_token(TokenType::COMMA);
@@ -120,11 +120,13 @@ std::vector<Token> Scanner::scan_file_contents() {
     for(auto error : errors) {
         error.print();
     }
+
+    return tokens;
 }
 
 bool Scanner::check_next_character(char next_char, TokenType type) {
     if(cursor + 1 < length && contents[cursor + 1] == next_char) {
-        tokens.push_back(Token(type, line, cursor, std::string(contents + cursor * sizeof(char), 2)));
+        tokens.push_back(Token(type, line, line_begin, cursor - line_begin, std::string(contents, cursor, 2)));
         cursor += 2;
         return true;
     }
@@ -133,7 +135,7 @@ bool Scanner::check_next_character(char next_char, TokenType type) {
 }
 
 void Scanner::add_single_char_token(TokenType type) {
-    tokens.push_back(Token(type, line, cursor, std::string(1, contents[cursor])));
+    tokens.push_back(Token(type, line, line_begin, cursor - line_begin, std::string(1, contents[cursor])));
     cursor++;
 }
 
@@ -151,11 +153,11 @@ void Scanner::add_string() {
     // cursor should now be at the closing quotation mark
 
     if(cursor == length) {
-        add_error("SyntaxError", "Unterminated string", start - 1);
+        add_error("SyntaxError", "Unterminated string", start - 1 - line_begin);
     }
     else {
-        std::string value = std::string(contents + start * sizeof(char), cursor - start);
-        tokens.push_back(Token(TokenType::STRING, line, cursor, value));
+        std::string value = std::string(contents, start, cursor - start);
+        tokens.push_back(Token(TokenType::STRING, line, line_begin, cursor - line_begin, value));
         cursor++;
     }
 }
@@ -173,26 +175,26 @@ void Scanner::add_number() {
     }
 
     if(isDouble) {
-        std::string val(contents + start * sizeof(char), cursor - start);
+        std::string val(contents, start, cursor - start);
         if(val[0] == '.') val = "0" + val; 
         else if(val[val.length() - 1] == '.') val += "0";
 
-        tokens.push_back(Token(TokenType::DOUBLE, line, start, val));
+        tokens.push_back(Token(TokenType::DOUBLE, line, line_begin, start - line_begin, val));
     }
     else {
-        std::string val(contents + start * sizeof(char), cursor - start);
-        tokens.push_back(Token(TokenType::INT, line, start, val));
+        std::string val(contents, start, cursor - start);
+        tokens.push_back(Token(TokenType::INT, line, line_begin, start - line_begin, val));
     }
 }
 
 void Scanner::add_identifier() {
-
+    cursor++;
 }
 
 void Scanner::add_error(std::string e_type, std::string e_desc, int col) {
     int line_end = line_begin;
     while(line_end < length && contents[line_end] != '\n') line_end++;
-    std::string e_line(contents + line_begin * sizeof(char), line_end - line_begin);
+    std::string e_line(contents, line_begin, line_end - line_begin);
 
     errors.push_back(Error(e_type, e_line, e_desc, filename, line, col));
     errorOccurred = true;

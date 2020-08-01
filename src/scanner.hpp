@@ -14,7 +14,7 @@ class Scanner {
         int line;
         int line_begin;
         int length;
-        char *contents;
+        std::string contents;
         std::string filename;
         std::vector<Token> tokens;
         std::vector<Error> errors;

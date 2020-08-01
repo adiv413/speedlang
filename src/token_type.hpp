@@ -34,7 +34,6 @@ enum class TokenType {
     LESS_EQUAL,
     PLUS_PLUS,
     MINUS_MINUS,
-    STAR_STAR,
     PLUS_EQUAL,
     MINUS_EQUAL,
     STAR_EQUAL,
@@ -53,6 +52,7 @@ enum class TokenType {
 
     AND,
     OR,
+    XOR,
     IF,
     ELSE,
     FOR,

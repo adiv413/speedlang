@@ -42,6 +42,10 @@ void runFile(char *filename) {
     string contents = get_file_contents(filename);
     Scanner sc(string(filename), contents);
     vector<Token> tokens = sc.scan_file_contents();
+
+    for(auto token : tokens) {
+        cout << token.value << "\n";
+    }
     //parse_file_contents - syntax analysis
     //execute_code
 }
