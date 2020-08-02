@@ -113,7 +113,12 @@ std::vector<Token> Scanner::scan_file_contents() {
 
             default:
                 if('0' <= current && current <= '9') add_number();
-                else add_identifier();
+                else if(check_identifier(current)) add_identifier();
+                else {
+                    add_error("SyntaxError", "Unexpected character", cursor - line_begin); 
+                    cursor++;
+                }
+                break;
         }
     }
 
@@ -188,7 +193,17 @@ void Scanner::add_number() {
 }
 
 void Scanner::add_identifier() {
-    cursor++;
+    int start = cursor;
+
+    while(check_identifier(contents[cursor])) cursor++;
+    std::string identifier_name(contents, start, cursor - start);
+
+    if(reserved_keywords.find(identifier_name) != reserved_keywords.end()) {
+        tokens.push_back(Token(reserved_keywords.at(identifier_name), line, line_begin, start - line_begin, identifier_name));
+    }
+    else {
+        tokens.push_back(Token(TokenType::IDENTIFIER, line, line_begin, start - line_begin, identifier_name));
+    }
 }
 
 void Scanner::add_error(std::string e_type, std::string e_desc, int col) {
@@ -198,4 +213,8 @@ void Scanner::add_error(std::string e_type, std::string e_desc, int col) {
 
     errors.push_back(Error(e_type, e_line, e_desc, filename, line, col));
     errorOccurred = true;
+}
+
+bool Scanner::check_identifier(char c) {
+    return isalpha(c) || c == '_' || c == '$' || c == '-';
 }

@@ -61,7 +61,11 @@ enum class TokenType {
     FUNC,
     RETURN,
     TRUE,
-    FALSE
+    FALSE,
+    CLASS,
+    PUBLIC,
+    PRIVATE,
+    STATIC
 
 };
 
