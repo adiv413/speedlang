@@ -42,7 +42,8 @@ std::vector<Token> Scanner::scan_file_contents() {
                 break;
             case '/':
                 if(check_next_character('=', TokenType::SLASH_EQUAL));
-                else if(cursor + 1 < length && contents[cursor + 1] == '/') while(contents[cursor + 1] != '\n') cursor++; // comment case: "//"
+                else if(cursor + 1 < length && contents[cursor + 1] == '/') while(cursor < length && contents[cursor] != '\n') cursor++; // comment case: "//"
+                else if(cursor + 1 < length && contents[cursor + 1] == '*') parse_block_comment();
                 else add_single_char_token(TokenType::SLASH);
                 break;
             case '%':
@@ -217,4 +218,26 @@ void Scanner::add_error(std::string e_type, std::string e_desc, int col) {
 
 bool Scanner::check_identifier(char c) {
     return isalpha(c) || c == '_' || c == '$' || c == '-';
+}
+
+void Scanner::parse_block_comment() {
+    int blk_com_begin = cursor - line_begin;
+    int num_newlines = 0;
+    int temp_line_begin = line_begin;
+
+    while(cursor + 1 < length && contents.substr(cursor, 2) != "*/") {
+        if(contents[cursor] == '\n') {
+            num_newlines++;
+            temp_line_begin = cursor + 1;
+        }
+        cursor++;
+    }
+
+    if(cursor + 1 == length && contents[cursor] != '*') {
+        add_error("SyntaxError", "Unclosed block comment at end of file", blk_com_begin);
+    }
+
+    line += num_newlines;
+    line_begin = temp_line_begin;
+    cursor += 2;
 }

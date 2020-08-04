@@ -65,8 +65,8 @@ enum class TokenType {
     CLASS,
     PUBLIC,
     PRIVATE,
-    STATIC
-
+    STATIC,
+    NULL_T
 };
 
 #endif
