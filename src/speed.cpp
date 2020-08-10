@@ -1,9 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <cerrno>
-#include "token_type.hpp"
-#include "exceptions.hpp"
 #include "scanner.hpp"
 
 using namespace std;
@@ -46,8 +43,11 @@ void runFile(char *filename) {
     for(auto token : tokens) {
         cout << token.value << "\n";
     }
-    //parse_file_contents - syntax analysis
-    //execute_code
+
+    if(tokens.size() != 0) {
+        //parse_file_contents - syntax analysis
+        //execute_code
+    }
 }
 
 string get_file_contents(char *filename) {
