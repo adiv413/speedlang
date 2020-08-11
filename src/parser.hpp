@@ -3,6 +3,7 @@
 
 #include "token.hpp"
 #include "expression.hpp"
+#include "exceptions.hpp"
 #include <vector>
 
 class Parser {

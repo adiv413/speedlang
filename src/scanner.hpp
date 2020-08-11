@@ -22,6 +22,7 @@ class Scanner {
         std::unordered_map<std::string, TokenType> reserved_keywords = {
             {"and", TokenType::AND},
             {"or", TokenType::OR},
+            {"not", TokenType::NOT},
             {"xor", TokenType::XOR},
             {"if", TokenType::IF},
             {"else", TokenType::ELSE},

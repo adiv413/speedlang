@@ -142,7 +142,7 @@ Expression Parser::addOperand() {
 
 
     //TODO: else throw error: expected expression
-
+    return Expression(nullptr, nullptr, nullptr);
 }
 
 bool Parser::matchesOperators(std::vector<TokenType> ops) {

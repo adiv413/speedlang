@@ -11,7 +11,7 @@ string get_file_contents(char *filename);
 
 int main(int argc, char **argv) {
     if(argc > 2) {
-        cout << "Usage: speed [file]";
+        cerr << "Usage: speed [file]";
         return 64; // exit code 64: incorrect command usage
     }
     else if(argc == 2) {
@@ -36,17 +36,29 @@ void runREPL() {
 }
 
 void runFile(char *filename) {
-    string contents = get_file_contents(filename);
-    Scanner sc(string(filename), contents);
-    vector<Token> tokens = sc.scan_file_contents();
+    string contents;
+    bool exception_caught = false;
 
-    for(auto token : tokens) {
-        cout << token.value << "\n";
+    try {
+        contents = get_file_contents(filename);
+    }
+    catch(const exception &e) {
+        exception_caught = true;
+        cerr << "ERROR: " << e.what() << "\n";
     }
 
-    if(tokens.size() != 0) {
-        //parse_file_contents - syntax analysis
-        //execute_code
+    if(!exception_caught) {
+        Scanner sc(string(filename), contents);
+        vector<Token> tokens = sc.scan_file_contents();
+
+        for(auto token : tokens) {
+            cout << token.value << "\n";
+        }
+
+        if(tokens.size() != 0) {
+            //parse_file_contents - syntax analysis
+            //execute_code
+        }
     }
 }
 
