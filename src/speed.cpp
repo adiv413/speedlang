@@ -52,7 +52,7 @@ void runFile(char *filename) {
         vector<Token> tokens = sc.scan_file_contents();
 
         for(auto token : tokens) {
-            cout << token.value << "\n";
+            cout << token.value << " ";
         }
 
         if(tokens.size() != 0) {

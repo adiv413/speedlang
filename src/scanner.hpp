@@ -48,6 +48,7 @@ class Scanner {
         void add_identifier();
         void add_error(std::string e_type, std::string e_desc, int col);
         void parse_block_comment();
+        void removeDuplicateNewlines();
 
     public:
         Scanner(std::string file, std::string raw_contents);

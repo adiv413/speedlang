@@ -4,7 +4,9 @@
 #include "token.hpp"
 #include "expression.hpp"
 #include "exceptions.hpp"
+#include "error.hpp"
 #include <vector>
+#include <memory>
 
 class Parser {
     private:
@@ -13,9 +15,10 @@ class Parser {
         std::vector<Expression> expressions;
         std::string filename;
         std::string contents;
-        bool errorOccurred;
+        std::unique_ptr<Error> currentError;
 
-        //void addTernary(); add this later along with equality
+
+        //TODO: void addTernary(); add this later along with assignment
         Expression parseExpression();
         Expression addOr();
         Expression addAnd();
@@ -29,13 +32,14 @@ class Parser {
         Expression addOperand();
 
         bool matchesOperators(std::vector<TokenType> ops);
-
-        // at lowest precedence, left = addoperatorhigherprecedence, if(match(operator)) operator = operator and right = w/e
-        // this recurses all the way up and brings it back all the way
+        void addError(std::string e_type, std::string e_desc);
+        void handleError(); // this method allows parsing to continue even after an error has been found
 
     public:
-        Parser(std::vector<Token> t, std::string con, std::string file, bool error) 
-        : tokens(t), filename(file), contents(con), errorOccurred(error), cursor(0) {}
+        bool errorOccurred;
+
+        Parser(std::vector<Token> t, std::string con, std::string file) 
+        : tokens(t), filename(file), contents(con), errorOccurred(false), cursor(0) {}
 
         std::vector<Expression> parseTokens();
 };

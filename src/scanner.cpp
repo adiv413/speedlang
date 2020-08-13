@@ -19,6 +19,9 @@ std::vector<Token> Scanner::scan_file_contents() {
                 cursor++;
                 break;
             case '\n':
+                if(tokens.size() != 0 && tokens.back().token_type != TokenType::BACKSLASH) add_single_char_token(TokenType::NEWLINE);
+                else if(tokens.size() != 0 && tokens.back().token_type == TokenType::BACKSLASH) tokens.pop_back();
+
                 line++;
                 cursor++;
                 line_begin = cursor;
@@ -97,6 +100,9 @@ std::vector<Token> Scanner::scan_file_contents() {
             case ';':
                 add_single_char_token(TokenType::SEMICOLON);
                 break;
+            case '\\':
+                add_single_char_token(TokenType::BACKSLASH);
+                break;
             case '.':
                 if(cursor + 1 < length && '0' <= contents[cursor + 1] && contents[cursor + 1] <= '9') add_number();
                 else add_single_char_token(TokenType::DOT);
@@ -126,6 +132,8 @@ std::vector<Token> Scanner::scan_file_contents() {
     for(auto error : errors) {
         error.print();
     }
+
+    removeDuplicateNewlines();
 
     return tokens;
 }
@@ -233,11 +241,25 @@ void Scanner::parse_block_comment() {
         cursor++;
     }
 
-    if(cursor + 1 == length && contents[cursor] != '*') {
+    if(cursor + 1 >= length && contents.substr(contents.length() - 2, 2) != "*/") {
         add_error("SyntaxError", "Unclosed block comment at end of file", blk_com_begin);
     }
 
     line += num_newlines;
     line_begin = temp_line_begin;
     cursor += 2;
+}
+
+void Scanner::removeDuplicateNewlines() {
+    TokenType target = TokenType::NEWLINE;
+    
+    int curr = 0;
+    while(curr < tokens.size()) {
+        if(curr + 1 < tokens.size() && tokens[curr].token_type == target && tokens[curr + 1].token_type == target) {
+            int end = ++curr;
+            while(end < tokens.size() && tokens[end].token_type == target) end++;
+            tokens.erase(tokens.begin() + curr, tokens.begin() + end);
+        }
+        curr++;
+    }
 }

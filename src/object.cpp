@@ -1,7 +1,5 @@
 #include "object.hpp"
 
-// TODO: handle null
-
 object::object(Token t) {
     type = t.token_type;
     switch(type) {

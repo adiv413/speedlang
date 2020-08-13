@@ -17,4 +17,30 @@ class FILE_NOT_FOUND_EXCEPTION : public std::exception {
         }
 };
 
+class UNCLOSED_PARENTHETICAL_SYNTAX_ERROR : public std::exception {
+    private:
+        std::string message;
+    public:
+        UNCLOSED_PARENTHETICAL_SYNTAX_ERROR() 
+        : message("Expected ')' to close parenthetical expression") {}
+
+        virtual const char* what() const throw()
+        {
+            return this->message.c_str();
+        }
+};
+
+class EXPECTED_EXPRESSION_SYNTAX_ERROR : public std::exception {
+    private:
+        std::string message;
+    public:
+        EXPECTED_EXPRESSION_SYNTAX_ERROR() 
+        : message("Expected expression; current token cannot start an expression") {}
+
+        virtual const char* what() const throw()
+        {
+            return this->message.c_str();
+        }
+};
+
 #endif
