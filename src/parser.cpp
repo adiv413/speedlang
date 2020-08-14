@@ -2,20 +2,34 @@
 
 //TODO: do evaluate() in expression.cpp
 
-std::vector<ExprPtr> Parser::parseTokens() { 
+void Parser::parseTokens() { 
     while(cursor < tokens.size()) {
-        try {
-            expressions.push_back(parseExpression());
-        }
-        catch(const std::exception &e) {
-            if(currentError) {
-                currentError->print();
-                currentError = nullptr;
+        if(tokens[cursor].token_type == TokenType::NEWLINE || tokens[cursor].token_type == TokenType::SEMICOLON) cursor++;
+        else {
+            try {
+                expressions.push_back(parseExpression());
+
+                // this if statement is necessary because expressions like 5 + 3 - 2 2 - 3 are legal otherwise
+                // those multiple-expressions-in-one-line expressions are evaluated as separate expressions 
+                // (e.g. 5 + 3 - 2 and 2 - 3), and are dangerous because they cause ambiguity when dealing with
+                // longer and more complex expressions
+                
+                if(cursor < tokens.size() && tokens[cursor].token_type != TokenType::NEWLINE && 
+                    tokens[cursor].token_type != TokenType::SEMICOLON) {
+
+                    addError("SyntaxError", "Expected semicolon or newline after end of expression");
+                    throw MISSING_LINE_SEPARATOR_SYNTAX_ERROR();
+                }
             }
-            handleError();
+            catch(const std::exception &e) {
+                if(currentError) {
+                    currentError->print();
+                    currentError = nullptr;
+                }
+                handleError();
+            }
         }
     }
-    return expressions;
 }
 
 ExprPtr Parser::parseExpression() {
@@ -122,9 +136,11 @@ ExprPtr Parser::addPostUnary() {
     if(matchesOperators({TokenType::INT, TokenType::DOUBLE, TokenType::STRING, TokenType::IDENTIFIER, TokenType::TRUE, 
         TokenType::FALSE, TokenType::NULL_T}) 
         && (tokens[cursor + 1].token_type == TokenType::PLUS_PLUS || tokens[cursor + 1].token_type == TokenType::MINUS_MINUS)) {
-        ExprPtr left(std::move(addOperand()));
-        TokenPtr op(new Token(tokens[cursor + 1]));
-        cursor += 2;
+        
+        ExprPtr left(std::move(addOperand())); // addOperand increments cursor for us so we can just call tokens[cursor] for the op
+        TokenPtr op(new Token(tokens[cursor]));
+
+        cursor++;
 
         return std::make_unique<Expression>(std::move(left), nullptr, std::move(op));
     }
@@ -208,7 +224,7 @@ void Parser::handleError() {
 }
 
 
-void Parser::print(ExprPtr root, int space)  
+void Parser::print(Expression *root, int space)  
 {  
     int COUNT = 10;
     // Base case  
@@ -219,7 +235,7 @@ void Parser::print(ExprPtr root, int space)
     space += COUNT;  
   
     // Process right child first  
-    print(std::move(root->right), space);  
+    print(root->right.get(), space);  
   
     // Print current node after space  
     // count  
@@ -229,5 +245,5 @@ void Parser::print(ExprPtr root, int space)
     std::cout<<root->op->value<<"\n";  
   
     // Process left child  
-    print(std::move(root->left), space);  
+    print(root->left.get(), space);  
 }  

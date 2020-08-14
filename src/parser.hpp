@@ -11,7 +11,6 @@ class Parser {
     private:
         int cursor;
         std::vector<Token> tokens;
-        std::vector<ExprPtr> expressions;
         std::string filename;
         std::string contents;
         std::unique_ptr<Error> currentError;
@@ -36,12 +35,13 @@ class Parser {
 
     public:
         bool errorOccurred;
+        std::vector<ExprPtr> expressions;
 
         Parser(std::vector<Token> t, std::string con, std::string file) 
         : tokens(t), filename(file), contents(con), errorOccurred(false), cursor(0) {}
 
-        std::vector<ExprPtr> parseTokens();
-        void print(ExprPtr root, int space);
+        void parseTokens();
+        void print(Expression *root, int space);
 };
 
 #endif

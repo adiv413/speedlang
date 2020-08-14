@@ -43,4 +43,17 @@ class EXPECTED_EXPRESSION_SYNTAX_ERROR : public std::exception {
         }
 };
 
+class MISSING_LINE_SEPARATOR_SYNTAX_ERROR : public std::exception {
+    private:
+        std::string message;
+    public:
+        MISSING_LINE_SEPARATOR_SYNTAX_ERROR() 
+        : message("Expected semicolon or newline after expression") {}
+
+        virtual const char* what() const throw()
+        {
+            return this->message.c_str();
+        }
+};
+
 #endif

@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include "scanner.hpp"
+#include "parser.hpp"
 
 using namespace std;
 
@@ -55,7 +56,16 @@ void runFile(char *filename) {
             cout << token.value << " ";
         }
 
+        cout << "\n\n\n";
+
         if(tokens.size() != 0) {
+            Parser p(tokens, contents, filename);
+            p.parseTokens();
+            if(!p.errorOccurred) {
+                for(int i = 0; i < p.expressions.size(); i++) {
+                    p.print(p.expressions[i].get(), 0);
+                }
+            }
             //parse_file_contents - syntax analysis
             //execute_code
         }

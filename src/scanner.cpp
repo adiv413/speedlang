@@ -4,7 +4,6 @@ Scanner::Scanner(std::string file, std::string raw_contents)
 : contents(raw_contents), cursor(0), line(0), length(raw_contents.length()), line_begin(0), filename(file), errorOccurred(false) {}
 
 std::vector<Token> Scanner::scan_file_contents() {
-
     while(cursor < length) {
         char current = contents[cursor];
 
@@ -19,7 +18,12 @@ std::vector<Token> Scanner::scan_file_contents() {
                 cursor++;
                 break;
             case '\n':
-                if(tokens.size() != 0 && tokens.back().token_type != TokenType::BACKSLASH) add_single_char_token(TokenType::NEWLINE);
+                if(tokens.size() != 0 && tokens.back().token_type != TokenType::BACKSLASH) {
+                    add_single_char_token(TokenType::NEWLINE);
+                    line++;
+                    line_begin = cursor;
+                    break;
+                }
                 else if(tokens.size() != 0 && tokens.back().token_type == TokenType::BACKSLASH) tokens.pop_back();
 
                 line++;

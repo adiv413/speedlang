@@ -3,7 +3,7 @@
 /* 
     * this method calculates the fibonacci sequence
     * @param x: an int representing how many iterations of the sequence should be performed
-    * @return: an int containing the xth value in the sequence*/
+    * @return: an int containing the xth value in the sequence
 
 
 func fib(x) {
@@ -24,5 +24,7 @@ func fib(x) {
 
     //this is a comment
 }
+*/
 
 
+5 - 2++ > 3 + 3
