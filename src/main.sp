@@ -1,4 +1,4 @@
-
+3+4
 
 /* 
     * this method calculates the fibonacci sequence
@@ -27,4 +27,3 @@ func fib(x) {
 */
 
 
-5 - 2++ > 3 + 3

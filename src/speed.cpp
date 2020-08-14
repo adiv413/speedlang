@@ -26,12 +26,40 @@ int main(int argc, char **argv) {
 }
 
 void runREPL() {
-    string x = "";
+    cout << "Vitesse Language REPL\nVitesse v0.0.1\nType \"exit\" to exit.\n";
+    string line = "";
+    string filename = "REPL";
 
-    while(x != "exit") {
+    while(true) {
         cout << ">>>"; 
-        cin >> x;
-        cout << x << "\n";
+        getline(cin, line);
+        line += '\n';
+
+        cout << line << endl;
+
+        if(line == "exit") {
+            break;
+        }
+        
+        Scanner sc(filename, line);
+        vector<Token> tokens = sc.scan_file_contents();
+
+        for(auto token : tokens) {
+            cout << token.value << " ";
+        }
+
+        cout << "\n\n\n";
+
+        if(tokens.size() != 0) {
+            Parser p(tokens, line, filename);
+            p.parseTokens();
+            if(!p.errorOccurred) {
+                for(int i = 0; i < p.expressions.size(); i++) {
+                    p.print(p.expressions[i].get(), 0);
+                }
+            }
+            //execute_code
+        }
     }
 
 }
@@ -66,7 +94,6 @@ void runFile(char *filename) {
                     p.print(p.expressions[i].get(), 0);
                 }
             }
-            //parse_file_contents - syntax analysis
             //execute_code
         }
     }

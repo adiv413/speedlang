@@ -17,6 +17,20 @@ class Parser {
 
 
         //TODO: void addTernary(); add this later along with assignment
+        // addTernary should just be:
+        /*
+            condition = expression
+            if current token == ?
+                question_op = current token
+                true_val = expression
+                if current != :
+                    throw error, expected colon after ternary operator ?
+                colon_op = current token
+                false_val = expression
+                ret = expression(condition, expression(true_val, false_val, colon_op), question_op)
+                return ret
+            return condition  
+            */
         ExprPtr parseExpression();
         ExprPtr addOr();
         ExprPtr addAnd();

@@ -1,7 +1,7 @@
 #include "scanner.hpp"
 
 Scanner::Scanner(std::string file, std::string raw_contents) 
-: contents(raw_contents), cursor(0), line(0), length(raw_contents.length()), line_begin(0), filename(file), errorOccurred(false) {}
+: contents(raw_contents), cursor(0), line(1), length(raw_contents.length()), line_begin(0), filename(file), errorOccurred(false) {}
 
 std::vector<Token> Scanner::scan_file_contents() {
     while(cursor < length) {

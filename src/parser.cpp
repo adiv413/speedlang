@@ -26,6 +26,11 @@ void Parser::parseTokens() {
                     currentError->print();
                     currentError = nullptr;
                 }
+                else {
+                    addError("SyntaxError", "");
+                    currentError->print();
+                    currentError = nullptr;
+                }
                 handleError();
             }
         }
