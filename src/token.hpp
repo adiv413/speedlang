@@ -14,6 +14,11 @@ class Token {
 
         Token(TokenType type, int line, int begin, int col, std::string val) 
         : token_type(type), line_number(line), line_begin(begin), col_number(col), value(val) {}
+
+
+
+        Token(const Token &t) 
+        : token_type(t.token_type), line_number(t.line_number), line_begin(t.line_begin), col_number(t.col_number), value(t.value) {}
 };
 
 #endif

@@ -2,14 +2,14 @@
 
 //TODO: do evaluate() in expression.cpp
 
-std::vector<Expression> Parser::parseTokens() { 
+std::vector<ExprPtr> Parser::parseTokens() { 
     while(cursor < tokens.size()) {
         try {
             expressions.push_back(parseExpression());
         }
         catch(const std::exception &e) {
             if(currentError) {
-                currentError.get()->print();
+                currentError->print();
                 currentError = nullptr;
             }
             handleError();
@@ -18,129 +18,130 @@ std::vector<Expression> Parser::parseTokens() {
     return expressions;
 }
 
-Expression Parser::parseExpression() {
-    return addOr();
+ExprPtr Parser::parseExpression() {
+    return std::move(addOr());
 }
 
-Expression Parser::addOr() {
-    Expression expr = addAnd();
+ExprPtr Parser::addOr() {
+    ExprPtr expr(std::move(addAnd()));
 
     while(matchesOperators({TokenType::OR})) {
-        Token *op = &tokens[cursor++];
-        Expression right = addAnd();
-        expr = Expression(&expr, &right, op);
+        TokenPtr op(new Token(tokens[cursor++]));
+        ExprPtr right(std::move(addAnd()));
+        expr = std::make_unique<Expression>(std::move(expr), std::move(right), std::move(op));
     }
 
-    return expr;
+    return std::move(expr);
 }
 
-Expression Parser::addAnd() {
-    Expression expr = addEquality();
+ExprPtr Parser::addAnd() {
+    ExprPtr expr(std::move(addEquality()));
 
     while(matchesOperators({TokenType::AND})) {
-        Token *op = &tokens[cursor++];
-        Expression right = addEquality();
-        expr = Expression(&expr, &right, op);
+        TokenPtr op(new Token(tokens[cursor++]));
+        ExprPtr right(std::move(addEquality()));
+        expr = std::make_unique<Expression>(std::move(expr), std::move(right), std::move(op));
     }
 
-    return expr;
+    return std::move(expr);
 }
 
-Expression Parser::addEquality() {
-    Expression expr = addComparison();
+ExprPtr Parser::addEquality() {
+    ExprPtr expr(std::move(addComparison()));
 
     while(matchesOperators({TokenType::EQUAL_EQUAL, TokenType::NOT_EQUAL})) {
-        Token *op = &tokens[cursor++];
-        Expression right = addComparison();
-        expr = Expression(&expr, &right, op);
+        TokenPtr op(new Token(tokens[cursor++]));
+        ExprPtr right(std::move(addComparison()));
+        expr = std::make_unique<Expression>(std::move(expr), std::move(right), std::move(op));
     }
 
-    return expr;
+    return std::move(expr);
 }
 
-Expression Parser::addComparison() {
-    Expression expr = addAddition();
+ExprPtr Parser::addComparison() {
+    ExprPtr expr(std::move(addAddition()));
 
     while(matchesOperators({TokenType::GREATER, TokenType::GREATER_EQUAL, TokenType::LESS, TokenType::LESS_EQUAL})) {
-        Token *op = &tokens[cursor++];
-        Expression right = addAddition();
-        expr = Expression(&expr, &right, op);
+        TokenPtr op(new Token(tokens[cursor++]));
+        ExprPtr right(std::move(addAddition()));
+        expr = std::make_unique<Expression>(std::move(expr), std::move(right), std::move(op));
     }
 
-    return expr;
+    return std::move(expr);
 }
 
-Expression Parser::addAddition() {
-    Expression expr = addMultiplication();
+ExprPtr Parser::addAddition() {
+    ExprPtr expr(std::move(addMultiplication()));
 
     while(matchesOperators({TokenType::PLUS, TokenType::MINUS})) {
-        Token *op = &tokens[cursor++];
-        Expression right = addMultiplication();
-        expr = Expression(&expr, &right, op);
+        TokenPtr op(new Token(tokens[cursor++]));
+        ExprPtr right(std::move(addMultiplication()));
+        expr = std::make_unique<Expression>(std::move(expr), std::move(right), std::move(op));
     }
 
-    return expr;
+    return std::move(expr);
 }
 
-Expression Parser::addMultiplication() {
-    Expression expr = addPower();
+ExprPtr Parser::addMultiplication() {
+    ExprPtr expr(std::move(addPower()));
 
     while(matchesOperators({TokenType::STAR, TokenType::SLASH, TokenType::PERCENT})) {
-        Token *op = &tokens[cursor++];
-        Expression right = addPower();
-        expr = Expression(&expr, &right, op);
+        TokenPtr op(new Token(tokens[cursor++]));
+        ExprPtr right(std::move(addPower()));
+        expr = std::make_unique<Expression>(std::move(expr), std::move(right), std::move(op));
     }
 
-    return expr;
+    return std::move(expr);
 }
 
-Expression Parser::addPower() {
-    Expression expr = addPreUnary();
+ExprPtr Parser::addPower() {
+    ExprPtr expr(std::move(addPreUnary()));
 
     while(matchesOperators({TokenType::CARET})) {
-        Token *op = &tokens[cursor++];
-        Expression right = addPreUnary();
-        expr = Expression(&expr, &right, op);
+        TokenPtr op(new Token(tokens[cursor++]));
+        ExprPtr right(std::move(addPreUnary()));
+        expr = std::make_unique<Expression>(std::move(expr), std::move(right), std::move(op));
     }
 
-    return expr;
+    return std::move(expr);
 }
 
-Expression Parser::addPreUnary() {
+ExprPtr Parser::addPreUnary() {
     if(matchesOperators({TokenType::PLUS_PLUS, TokenType::MINUS_MINUS, TokenType::NOT, TokenType::PLUS, TokenType::MINUS})) {
-        Token *op = &tokens[cursor++];
-        Expression right = addPreUnary();
-        return Expression(nullptr, &right, op);
+        TokenPtr op(new Token(tokens[cursor++]));
+        ExprPtr right(std::move(addPreUnary()));
+        return std::make_unique<Expression>(nullptr, std::move(right), std::move(op));
     }
 
-    return addPostUnary();
+    return std::move(addPostUnary());
 }
 
-Expression Parser::addPostUnary() {
+ExprPtr Parser::addPostUnary() {
     //if current is a operand and next is a ++ or --
 
     if(matchesOperators({TokenType::INT, TokenType::DOUBLE, TokenType::STRING, TokenType::IDENTIFIER, TokenType::TRUE, 
         TokenType::FALSE, TokenType::NULL_T}) 
         && (tokens[cursor + 1].token_type == TokenType::PLUS_PLUS || tokens[cursor + 1].token_type == TokenType::MINUS_MINUS)) {
-        
-        Expression left = addOperand();
-        Token *op = &tokens[cursor + 1];
+        ExprPtr left(std::move(addOperand()));
+        TokenPtr op(new Token(tokens[cursor + 1]));
         cursor += 2;
 
-        return Expression(&left, nullptr, op);
+        return std::make_unique<Expression>(std::move(left), nullptr, std::move(op));
     }
 
-    return addOperand();
+    return std::move(addOperand());
 }
 
-Expression Parser::addOperand() {
+ExprPtr Parser::addOperand() {
     if(matchesOperators({TokenType::INT, TokenType::DOUBLE, TokenType::STRING, TokenType::IDENTIFIER, TokenType::TRUE, 
-        TokenType::FALSE, TokenType::NULL_T})) return Expression(nullptr, nullptr, &tokens[cursor++]);
+        TokenType::FALSE, TokenType::NULL_T})) {
+
+        return std::make_unique<Expression>(ExprPtr(), ExprPtr(), TokenPtr(new Token(tokens[cursor++])));
+    }
 
     else if(matchesOperators({TokenType::LEFT_PAREN})) {
-        Token *left_paren = &tokens[cursor];
-        cursor++;
-        Expression expr = parseExpression();
+        TokenPtr left_paren(new Token(tokens[cursor++]));
+        ExprPtr expr(std::move(parseExpression()));
         
         if(!matchesOperators({TokenType::RIGHT_PAREN})) {
             addError("SyntaxError", "Expected ')' to close parenthetical expression");
@@ -148,7 +149,7 @@ Expression Parser::addOperand() {
         }
         cursor++;
 
-        return Expression(nullptr, &expr, left_paren);
+        return std::make_unique<Expression>(nullptr, std::move(expr), std::move(left_paren));
     }
 
     addError("SyntaxError", "Expected expression; current token cannot start an expression");
@@ -205,3 +206,28 @@ void Parser::handleError() {
         }
     }
 }
+
+
+void Parser::print(ExprPtr root, int space)  
+{  
+    int COUNT = 10;
+    // Base case  
+    if (root == NULL)  
+        return;  
+  
+    // Increase distance between levels  
+    space += COUNT;  
+  
+    // Process right child first  
+    print(std::move(root->right), space);  
+  
+    // Print current node after space  
+    // count  
+    std::cout<<std::endl;  
+    for (int i = COUNT; i < space; i++)  
+        std::cout<<" ";  
+    std::cout<<root->op->value<<"\n";  
+  
+    // Process left child  
+    print(std::move(root->left), space);  
+}  

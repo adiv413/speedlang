@@ -6,30 +6,29 @@
 #include "exceptions.hpp"
 #include "error.hpp"
 #include <vector>
-#include <memory>
 
 class Parser {
     private:
         int cursor;
         std::vector<Token> tokens;
-        std::vector<Expression> expressions;
+        std::vector<ExprPtr> expressions;
         std::string filename;
         std::string contents;
         std::unique_ptr<Error> currentError;
 
 
         //TODO: void addTernary(); add this later along with assignment
-        Expression parseExpression();
-        Expression addOr();
-        Expression addAnd();
-        Expression addEquality();
-        Expression addComparison();
-        Expression addAddition();
-        Expression addMultiplication();
-        Expression addPower();
-        Expression addPreUnary();
-        Expression addPostUnary();
-        Expression addOperand();
+        ExprPtr parseExpression();
+        ExprPtr addOr();
+        ExprPtr addAnd();
+        ExprPtr addEquality();
+        ExprPtr addComparison();
+        ExprPtr addAddition();
+        ExprPtr addMultiplication();
+        ExprPtr addPower();
+        ExprPtr addPreUnary();
+        ExprPtr addPostUnary();
+        ExprPtr addOperand();
 
         bool matchesOperators(std::vector<TokenType> ops);
         void addError(std::string e_type, std::string e_desc);
@@ -41,7 +40,8 @@ class Parser {
         Parser(std::vector<Token> t, std::string con, std::string file) 
         : tokens(t), filename(file), contents(con), errorOccurred(false), cursor(0) {}
 
-        std::vector<Expression> parseTokens();
+        std::vector<ExprPtr> parseTokens();
+        void print(ExprPtr root, int space);
 };
 
 #endif
