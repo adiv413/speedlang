@@ -10,7 +10,7 @@ class Error {
         std::string error_desc;
         std::string filename;
         int line;
-        int col; // column of the beginning of the erroneous token
+        int col; // column (distance from the beginning of the line to the current position) of the beginning of the erroneous token
 
         Error(std::string type, std::string e_line, std::string desc, std::string file, int line_num, int col_num)
         : error_type(type), error_line(e_line), error_desc(desc), line(line_num), col(col_num), filename(file) {}

@@ -14,12 +14,12 @@ void Parser::parseTokens() {
                 // (e.g. 5 + 3 - 2 and 2 - 3), and are dangerous because they cause ambiguity when dealing with
                 // longer and more complex expressions
                 
-                if(cursor < tokens.size() && tokens[cursor].token_type != TokenType::NEWLINE && 
-                    tokens[cursor].token_type != TokenType::SEMICOLON) {
+                // if(cursor < tokens.size() && tokens[cursor].token_type != TokenType::NEWLINE && 
+                //     tokens[cursor].token_type != TokenType::SEMICOLON) {
 
-                    addError("SyntaxError", "Expected semicolon or newline after end of expression");
-                    throw MISSING_LINE_SEPARATOR_SYNTAX_ERROR();
-                }
+                //     addError("SyntaxError", "Expected semicolon or newline after end of expression");
+                //     throw MISSING_LINE_SEPARATOR_SYNTAX_ERROR();
+                // }
             }
             catch(const std::exception &e) {
                 if(currentError) {

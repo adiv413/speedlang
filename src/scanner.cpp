@@ -188,6 +188,12 @@ void Scanner::add_number() {
     char curr = contents[cursor];
 
     while(cursor < length && ('0' <= curr && curr <= '9' || curr == '.')) {
+        // if there are multiple dots in one double
+        if(curr == '.' && isDouble) {
+            add_error("SyntaxError", "Invalid double declaration", cursor - line_begin);
+            while(cursor < length && ('0' <= curr && curr <= '9' || curr == '.')) curr = contents[++cursor];
+            return;
+        }
         if(curr == '.') isDouble = true;
         curr = contents[++cursor];
     }
@@ -208,7 +214,7 @@ void Scanner::add_number() {
 void Scanner::add_identifier() {
     int start = cursor;
 
-    while(check_identifier(contents[cursor])) cursor++;
+    while(cursor < length && check_identifier(contents[cursor])) cursor++;
     std::string identifier_name(contents, start, cursor - start);
 
     if(reserved_keywords.find(identifier_name) != reserved_keywords.end()) {
@@ -219,6 +225,7 @@ void Scanner::add_identifier() {
     }
 }
 
+// note: col is the distance from the beginning of the line to the current position
 void Scanner::add_error(std::string e_type, std::string e_desc, int col) {
     int line_end = line_begin;
     while(line_end < length && contents[line_end] != '\n') line_end++;
@@ -229,7 +236,7 @@ void Scanner::add_error(std::string e_type, std::string e_desc, int col) {
 }
 
 bool Scanner::check_identifier(char c) {
-    return isalpha(c) || c == '_' || c == '$' || c == '-';
+    return isalpha(c) || c == '_' || c == '$' || c == '-' || ('0' <= c && c <= '9');
 }
 
 void Scanner::parse_block_comment() {

@@ -1,5 +1,3 @@
-3+4
-
 /* 
     * this method calculates the fibonacci sequence
     * @param x: an int representing how many iterations of the sequence should be performed
@@ -25,5 +23,4 @@ func fib(x) {
     //this is a comment
 }
 */
-
-
+3+++

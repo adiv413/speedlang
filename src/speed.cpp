@@ -77,6 +77,7 @@ void runFile(char *filename) {
     }
 
     if(!exception_caught) {
+        contents += '\n';
         Scanner sc(string(filename), contents);
         vector<Token> tokens = sc.scan_file_contents();
 

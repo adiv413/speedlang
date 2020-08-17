@@ -1,41 +1,66 @@
 #include "object.hpp"
 
+object::object() {}
+
 object::object(Token t) {
     type = t.token_type;
     switch(type) {
         case TokenType::INT:
             {
                 int temp = std::stoi(t.value);
-                value = static_cast<void *>(&temp);
+                type_ptr = std::make_unique<int_t>(temp);
                 break;
             }
         case TokenType::DOUBLE:
             {
                 double temp = std::stod(t.value);
-                value = static_cast<void *>(&temp);
+                type_ptr = std::make_unique<double_t>(temp);
                 break;
             }
         case TokenType::TRUE:
             {
                 bool temp = true;
-                value = static_cast<void *>(&temp);
+                type_ptr = std::make_unique<bool_t>(temp);
                 break;
             }
         case TokenType::FALSE:
             {
                 bool temp = false;
-                value = static_cast<void *>(&temp);
-                break;
-            }
-        case TokenType::NULL_T:
-            {
-                value = nullptr;
+                type_ptr = std::make_unique<bool_t>(temp);
                 break;
             }
         case TokenType::STRING:
             {
-                value = static_cast<void *>(&t.value);
-            break;
+                type_ptr = std::make_unique<string_t>(t.value);
+                break;
             }
+        case TokenType::NULL_T:
+            {
+                type_ptr = nullptr;
+                break;
+            }
+        default:
+            break;
+            //TODO: throw an error or smth
     }
+}
+
+void* object::getValue() {
+    return type_ptr->getValue();
+}
+
+void* int_t::getValue() {
+    return static_cast<void *>(&value);
+}
+
+void* bool_t::getValue() {
+    return static_cast<void *>(&value);
+}
+
+void* double_t::getValue() {
+    return static_cast<void *>(&value);
+}
+
+void* string_t::getValue() {
+    return static_cast<void *>(&value);
 }
