@@ -94,8 +94,9 @@ void runFile(char *filename) {
                 for(int i = 0; i < p.expressions.size(); i++) {
                     p.print(p.expressions[i].get(), 0);
                 }
+
+                //execute_code
             }
-            //execute_code
         }
     }
 }

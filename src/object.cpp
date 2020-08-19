@@ -2,36 +2,37 @@
 
 object::object() {}
 
-object::object(Token t) {
-    type = t.token_type;
+object::object(Token *t) {
+    type = t->token_type;
     switch(type) {
         case TokenType::INT:
             {
-                int temp = std::stoi(t.value);
-                type_ptr = std::make_unique<int_t>(temp);
+                type_ptr = std::make_unique<int_t>(std::stoi(t->value));
                 break;
             }
         case TokenType::DOUBLE:
             {
-                double temp = std::stod(t.value);
-                type_ptr = std::make_unique<double_t>(temp);
+                type_ptr = std::make_unique<double_t>(std::stod(t->value));
                 break;
             }
         case TokenType::TRUE:
             {
-                bool temp = true;
-                type_ptr = std::make_unique<bool_t>(temp);
+                type_ptr = std::make_unique<bool_t>(true);
                 break;
             }
         case TokenType::FALSE:
             {
-                bool temp = false;
-                type_ptr = std::make_unique<bool_t>(temp);
+                type_ptr = std::make_unique<bool_t>(false);
                 break;
             }
         case TokenType::STRING:
             {
-                type_ptr = std::make_unique<string_t>(t.value);
+                type_ptr = std::make_unique<string_t>(t->value);
+                break;
+            }
+        case TokenType::IDENTIFIER:
+            {
+                type_ptr = std::make_unique<reference_t>(t->value);
                 break;
             }
         case TokenType::NULL_T:
@@ -63,4 +64,8 @@ void* double_t::getValue() {
 
 void* string_t::getValue() {
     return static_cast<void *>(&value);
+}
+
+void* reference_t::getValue() {
+    return static_cast<void *>(&identifier_name);
 }

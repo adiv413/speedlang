@@ -19,7 +19,7 @@ class Scanner {
         std::string filename;
         std::vector<Token> tokens;
         std::vector<Error> errors;
-        std::unordered_map<std::string, TokenType> reserved_keywords = {
+        const std::unordered_map<std::string, TokenType> reserved_keywords = {
             {"and", TokenType::AND},
             {"or", TokenType::OR},
             {"not", TokenType::NOT},

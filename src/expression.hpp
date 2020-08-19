@@ -16,7 +16,6 @@ class Expression {
 
         // check token types with operators, if they are good then create objects and evaluate
         // have a base lookup table of operator actions and types and evaluate based on that (allows for operator overloading)
-        object evaluate(); 
         
 };
 
