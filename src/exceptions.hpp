@@ -56,4 +56,17 @@ class MISSING_LINE_SEPARATOR_SYNTAX_ERROR : public std::exception {
         }
 };
 
+class UNSUPPORTED_OPERAND_TYPES_ERROR : public std::exception {
+    private:
+        std::string message;
+    public:
+        UNSUPPORTED_OPERAND_TYPES_ERROR() 
+        : message("Unsupported operand type(s) for operator") {}
+
+        virtual const char* what() const throw()
+        {
+            return this->message.c_str();
+        }
+};
+
 #endif
