@@ -42,69 +42,36 @@ object Evaluator::evaluateExpression(ExprPtr *expr) {
 object Evaluator::evaluateUnary(Token *op, object operand) {
     TokenType op_type = op->token_type;
 
-    switch(op_type) {
-        case TokenType::PLUS_PLUS:
-            try {
-                return op_plus_plus(&operand);
-            }
-            catch(const std::exception &e) {
-                if(token_type_to_string_map.find(operand.type) != token_type_to_string_map.end()) {
-                    addError(op, "RuntimeError", "operator '" + op->value + "' does not support operand type '" + 
-                    token_type_to_string_map.at(operand.type) + "'");
-                }
-                throw UNSUPPORTED_OPERAND_TYPES_ERROR();
-            }
-        case TokenType::MINUS_MINUS:
-            try {
-                return op_minus_minus(&operand);
-            }
-            catch(const std::exception &e) {
-                if(token_type_to_string_map.find(operand.type) != token_type_to_string_map.end()) {
-                    addError(op, "RuntimeError", "operator '" + op->value + "' does not support operand type '" + 
-                    token_type_to_string_map.at(operand.type) + "'");
-                }
-                throw UNSUPPORTED_OPERAND_TYPES_ERROR();
-            }
-        case TokenType::PLUS:
-            try {
-                return op_unary_plus(&operand);
-            }
-            catch(const std::exception &e) {
-                if(token_type_to_string_map.find(operand.type) != token_type_to_string_map.end()) {
-                    addError(op, "RuntimeError", "operator '" + op->value + "' does not support operand type '" + 
-                    token_type_to_string_map.at(operand.type) + "'");
-                }
-                throw UNSUPPORTED_OPERAND_TYPES_ERROR();
-            }
-        case TokenType::MINUS:
-            try {
-                return op_unary_minus(&operand);
-            }
-            catch(const std::exception &e) {
-                if(token_type_to_string_map.find(operand.type) != token_type_to_string_map.end()) {
-                    addError(op, "RuntimeError", "operator '" + op->value + "' does not support operand type '" + 
-                    token_type_to_string_map.at(operand.type) + "'");
-                }
-                throw UNSUPPORTED_OPERAND_TYPES_ERROR();
-            }
-        case TokenType::NOT:
-            try {
-                return op_not(&operand);
-            }
-            catch(const std::exception &e) {
-                if(token_type_to_string_map.find(operand.type) != token_type_to_string_map.end()) {
-                    addError(op, "RuntimeError", "operator '" + op->value + "' does not support operand type '" + 
-                    token_type_to_string_map.at(operand.type) + "'");
-                }
-                throw UNSUPPORTED_OPERAND_TYPES_ERROR();
-            }
+    try {
+        UnaryFunc func = token_type_to_unary_func_map[op_type];
+        return (this->*func)(&operand);
     }
-    
-    throw UNSUPPORTED_OPERAND_TYPES_ERROR();
+    catch(const std::exception &e) {
+        if(token_type_to_string_map.find(operand.type) != token_type_to_string_map.end()) {
+            addError(op, "RuntimeError", "operator '" + op->value + "' does not support operand type '" + 
+            token_type_to_string_map.at(operand.type) + "'");
+        }
+        throw UNSUPPORTED_OPERAND_TYPES_ERROR();
+    }
 }
 
 object Evaluator::evaluateBinary(Token *op, object leftOperand, object rightOperand) {
+    TokenType op_type = op->token_type;
 
+    try {
+        BinaryFunc func = token_type_to_binary_func_map[op_type];
+        return (this->*func)(&leftOperand, &rightOperand);
+    }
+    catch(const std::exception &e) {
+        if(token_type_to_string_map.find(leftOperand.type) != token_type_to_string_map.end() && 
+            token_type_to_string_map.find(rightOperand.type) != token_type_to_string_map.end()) {
+
+            addError(op, "RuntimeError", "operator '" + op->value + "' does not support operand types '" + 
+            token_type_to_string_map.at(leftOperand.type) + "', '" + 
+            token_type_to_string_map.at(rightOperand.type) + "'");
+        }
+        throw UNSUPPORTED_OPERAND_TYPES_ERROR();
+    }
 }
 
 object Evaluator::op_plus_plus(object *operand) {
@@ -181,7 +148,149 @@ object Evaluator::op_not(object *operand) {
 }
 
 object Evaluator::op_binary_plus(object *leftOperand, object *rightOperand) {
+    TokenType left = leftOperand->type;
+    TokenType right = rightOperand->type;
 
+    switch(left) {
+        case TokenType::STRING:
+            {
+                std::string leftValue = *static_cast<std::string *>(leftOperand->getValue()); 
+
+                switch(right) {
+                    case TokenType::STRING:
+                        {
+                            std::string rightValue = *static_cast<std::string *>(rightOperand->getValue());
+                            return object(leftValue + rightValue);
+                        }
+                    case TokenType::INT:
+                        {
+                            int rightValue = *static_cast<int *>(rightOperand->getValue());
+                            return object(leftValue + std::to_string(rightValue));
+                        }
+                    case TokenType::DOUBLE:
+                        {
+                            double rightValue = *static_cast<double *>(rightOperand->getValue());
+                            return object(leftValue + std::to_string(rightValue));
+                        }
+                    case TokenType::IDENTIFIER:
+                        {
+                            //TODO: implement
+                        }
+                    case TokenType::NULL_T:
+                        {
+                            return leftValue + token_type_to_string_map.at(TokenType::NULL_T);
+                        }
+                }
+                break;
+            }
+        case TokenType::INT:
+           { 
+               switch(right) {
+                    case TokenType::STRING: 
+                        {
+
+                        }
+                    case TokenType::INT: 
+                        {
+
+                        }
+                    case TokenType::DOUBLE: 
+                        {
+
+                        }
+                    case TokenType::IDENTIFIER: 
+                        {
+
+                        }
+                    case TokenType::NULL_T: 
+                        {
+
+                        }
+                }
+                break;
+            }
+
+        case TokenType::DOUBLE:
+            {
+                switch(right) {
+                    case TokenType::STRING: 
+                        {
+
+                        }
+                    case TokenType::INT: 
+                        {
+
+                        }
+                    case TokenType::DOUBLE: 
+                        {
+
+                        }
+                    case TokenType::IDENTIFIER: 
+                        {
+
+                        }
+                    case TokenType::NULL_T: 
+                        {
+
+                        }
+                }
+                break;
+            }
+
+        case TokenType::IDENTIFIER:
+            {
+                switch(right) {
+                    case TokenType::STRING: 
+                        {
+
+                        }
+                    case TokenType::INT: 
+                        {
+
+                        }
+                    case TokenType::DOUBLE: 
+                        {
+
+                        }
+                    case TokenType::IDENTIFIER: 
+                        {
+
+                        }
+                    case TokenType::NULL_T: 
+                        {
+
+                        }
+                }
+                break;
+            }
+
+        case TokenType::NULL_T:
+            {
+                switch(right) {
+                    case TokenType::STRING: 
+                        {
+
+                        }   
+                    case TokenType::INT: 
+                        {
+
+                        }
+                    case TokenType::DOUBLE: 
+                        {
+
+                        }
+                    case TokenType::IDENTIFIER: 
+                        {
+
+                        }
+                    case TokenType::NULL_T: 
+                        {
+
+                        }
+                }
+                break;
+            }
+    }
 }
 
 object Evaluator::op_binary_minus(object *leftOperand, object *rightOperand) {

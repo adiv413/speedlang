@@ -10,6 +10,10 @@
 #include <unordered_map>
 
 class Evaluator {
+    public:
+        typedef object (Evaluator::*UnaryFunc) (object *);
+        typedef object (Evaluator::*BinaryFunc) (object *, object *);
+
     private:
 
     //do type checking in the functions themselves, bc they pass objects anyway
@@ -18,6 +22,7 @@ class Evaluator {
         std::string filename;
         std::string contents;
         std::unique_ptr<Error> currentError;
+
         const std::unordered_map<TokenType, std::string> token_type_to_string_map = {
             {TokenType::STRING, "string"},
             {TokenType::INT, "int"},
@@ -26,10 +31,31 @@ class Evaluator {
             {TokenType::NULL_T, "null"}
         };
 
+        std::unordered_map<TokenType, UnaryFunc> token_type_to_unary_func_map = {
+            {TokenType::PLUS_PLUS, &op_plus_plus},
+            {TokenType::MINUS_MINUS, &op_minus_minus},
+            {TokenType::PLUS, &op_unary_plus},
+            {TokenType::MINUS, &op_unary_minus},
+            {TokenType::NOT, &op_not}
+        };
+
+        std::unordered_map<TokenType, BinaryFunc> token_type_to_binary_func_map = {
+            {TokenType::PLUS, &op_binary_plus},
+            {TokenType::MINUS, &op_binary_minus},
+            {TokenType::STAR, &op_star},
+            {TokenType::SLASH, &op_slash},
+            {TokenType::PERCENT, &op_percent},
+            {TokenType::CARET, &op_caret},
+            {TokenType::GREATER, &op_greater},
+            {TokenType::LESS, &op_less},
+            {TokenType::GREATER_EQUAL, &op_greater_equal},
+            {TokenType::LESS_EQUAL, &op_less_equal}
+        };
+
         object evaluateExpression(ExprPtr *expr);
         object evaluateUnary(Token *op, object operand); //TODO: when doing identifiers, take the token value (identifier name) and match that to an object via symbol table;
         object evaluateBinary(Token *op, object leftOperand, object rightOperand); //TODO: have switch case based on operator type and call helper functions for each operator type
-        
+
         //unary operators
 
         object op_plus_plus(object *operand);
