@@ -7,12 +7,12 @@ object::object(Token *t) {
     switch(type) {
         case TokenType::INT:
             {
-                type_ptr = std::make_unique<int_t>(std::stoi(t->value));
+                type_ptr = std::make_unique<int_t>(std::stoll(t->value));
                 break;
             }
         case TokenType::DOUBLE:
             {
-                type_ptr = std::make_unique<double_t>(std::stod(t->value));
+                type_ptr = std::make_unique<double_t>(std::stold(t->value));
                 break;
             }
         case TokenType::TRUE:

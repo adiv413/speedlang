@@ -8,6 +8,9 @@
 // for identifiers: map identifier names to objects
 // for lists: vector<object *>
 
+using ll = long long;
+using ld = long double;
+
 class object { 
     public:
         std::unique_ptr<object> type_ptr;
@@ -15,8 +18,8 @@ class object {
 
         object();
         object(Token *t);
-        object(int i) : type_ptr(new int_t(i)), type(TokenType::INT) {}
-        object(double d) : type_ptr(new double_t(d)), type(TokenType::DOUBLE) {}
+        object(ll i) : type_ptr(new int_t(i)), type(TokenType::INT) {}
+        object(ld d) : type_ptr(new double_t(d)), type(TokenType::DOUBLE) {}
         object(bool b) : type_ptr(new bool_t(b)), type(b ? TokenType::TRUE : TokenType::FALSE) {}
         object(std::string s) : type_ptr(new string_t(s)), type(TokenType::STRING) {}
         object(std::nullptr_t n) : type_ptr(n), type(TokenType::NULL_T) {}
@@ -25,9 +28,9 @@ class object {
 
 class int_t : public object { 
     public:
-        int value;
+        ll value;
         
-        int_t(int i) : value(i) {}
+        int_t(ll i) : value(i) {}
         void* getValue() override;
 };
 
@@ -41,9 +44,9 @@ class bool_t : public object {
 
 class double_t : public object { 
     public:
-        double value;
+        ld value;
         
-        double_t(double d) : value(d) {}
+        double_t(ld d) : value(d) {}
         void* getValue() override;
 };
 

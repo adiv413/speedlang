@@ -97,10 +97,10 @@ object Evaluator::op_unary_plus(object *operand) {
 
     switch(op) {
         case TokenType::INT:
-            int ret = *static_cast<int *>(operand->getValue());
+            ll ret = *static_cast<ll *>(operand->getValue());
             return object(ret >= 0 ? ret : -ret);
         case TokenType::DOUBLE:
-            return object(std::fabs(*static_cast<double *>(operand->getValue())));
+            return object(std::fabs(*static_cast<ld *>(operand->getValue())));
         case TokenType::IDENTIFIER:
             //TODO: implement
             break;
@@ -116,9 +116,9 @@ object Evaluator::op_unary_minus(object *operand) {
 
     switch(op) {
         case TokenType::INT:
-            return object(-*static_cast<int *>(operand->getValue()));
+            return object(-*static_cast<ll *>(operand->getValue()));
         case TokenType::DOUBLE:
-            return object(-*static_cast<double *>(operand->getValue()));
+            return object(-*static_cast<ld *>(operand->getValue()));
         case TokenType::IDENTIFIER:
             //TODO: implement
             break;
@@ -164,12 +164,12 @@ object Evaluator::op_binary_plus(object *leftOperand, object *rightOperand) {
                         }
                     case TokenType::INT:
                         {
-                            int rightValue = *static_cast<int *>(rightOperand->getValue());
+                            ll rightValue = *static_cast<ll *>(rightOperand->getValue());
                             return object(leftValue + std::to_string(rightValue));
                         }
                     case TokenType::DOUBLE:
                         {
-                            double rightValue = *static_cast<double *>(rightOperand->getValue());
+                            ld rightValue = *static_cast<ld *>(rightOperand->getValue());
                             return object(leftValue + std::to_string(rightValue));
                         }
                     case TokenType::IDENTIFIER:
@@ -185,7 +185,7 @@ object Evaluator::op_binary_plus(object *leftOperand, object *rightOperand) {
             }
         case TokenType::INT:
            { 
-               int leftValue = *static_cast<int *>(leftOperand->getValue());
+               ll leftValue = *static_cast<ll *>(leftOperand->getValue());
 
                switch(right) {
                     case TokenType::STRING: 
@@ -195,21 +195,17 @@ object Evaluator::op_binary_plus(object *leftOperand, object *rightOperand) {
                         }
                     case TokenType::INT: 
                         {
-                            int rightValue = *static_cast<int *>(rightOperand->getValue());
+                            ll rightValue = *static_cast<ll *>(rightOperand->getValue());
                             return object(leftValue + rightValue);
                         }
                     case TokenType::DOUBLE: 
                         {
-                            double rightValue = *static_cast<double *>(rightOperand->getValue());
+                            ld rightValue = *static_cast<ld *>(rightOperand->getValue());
                             return object(leftValue + rightValue);
                         }
                     case TokenType::IDENTIFIER: 
                         {
                             //TODO: implement
-                        }
-                    case TokenType::NULL_T: 
-                        {
-                            throw UNSUPPORTED_OPERAND_TYPES_ERROR();
                         }
                 }
                 break;
@@ -217,7 +213,7 @@ object Evaluator::op_binary_plus(object *leftOperand, object *rightOperand) {
 
         case TokenType::DOUBLE:
             {
-                double leftValue = *static_cast<double *>(rightOperand->getValue());
+                ld leftValue = *static_cast<ld *>(rightOperand->getValue());
 
                 switch(right) {
                     case TokenType::STRING: 
@@ -227,21 +223,17 @@ object Evaluator::op_binary_plus(object *leftOperand, object *rightOperand) {
                         }
                     case TokenType::INT: 
                         {
-                            int rightValue = *static_cast<int *>(rightOperand->getValue());
+                            ll rightValue = *static_cast<ll *>(rightOperand->getValue());
                             return object(leftValue + rightValue);
                         }
                     case TokenType::DOUBLE: 
                         {
-                            double rightValue = *static_cast<double *>(rightOperand->getValue());
+                            ld rightValue = *static_cast<ld *>(rightOperand->getValue());
                             return object(leftValue + rightValue);
                         }
                     case TokenType::IDENTIFIER: 
                         {
                             //TODO: implement
-                        }
-                    case TokenType::NULL_T: 
-                        {
-                            throw UNSUPPORTED_OPERAND_TYPES_ERROR();
                         }
                 }
                 break;
@@ -256,11 +248,11 @@ object Evaluator::op_binary_plus(object *leftOperand, object *rightOperand) {
                         }
                     case TokenType::INT: 
                         {
-                            int rightValue = *static_cast<int *>(rightOperand->getValue());
+                            ll rightValue = *static_cast<ll *>(rightOperand->getValue());
                         }
                     case TokenType::DOUBLE: 
                         {
-                            double rightValue = *static_cast<double *>(rightOperand->getValue());
+                            ld rightValue = *static_cast<ld *>(rightOperand->getValue());
                         }
                     case TokenType::IDENTIFIER: 
                         {
@@ -282,49 +274,408 @@ object Evaluator::op_binary_plus(object *leftOperand, object *rightOperand) {
                             std::string rightValue = *static_cast<std::string *>(rightOperand->getValue());
                             return object(token_type_to_string_map.at(TokenType::NULL_T) + rightValue);
                         }
-                    case TokenType::INT: 
-                        {
-                            throw UNSUPPORTED_OPERAND_TYPES_ERROR();
-                        }
-                    case TokenType::DOUBLE: 
-                        {
-                            throw UNSUPPORTED_OPERAND_TYPES_ERROR();
-                        }
                     case TokenType::IDENTIFIER: 
                         {
                             //TODO: implement
-                        }
-                    case TokenType::NULL_T: 
-                        {
-                            return object(nullptr);
                         }
                 }
                 break;
             }
     }
+    throw UNSUPPORTED_OPERAND_TYPES_ERROR();
 }
 
 object Evaluator::op_binary_minus(object *leftOperand, object *rightOperand) {
+    TokenType left = leftOperand->type;
+    TokenType right = rightOperand->type;
 
+    switch(left) {
+        case TokenType::INT:
+            {
+                ll leftValue = *static_cast<ll *>(leftOperand->getValue());
+
+                switch(right) {
+                    case TokenType::INT: 
+                        {
+                            ll rightValue = *static_cast<ll *>(rightOperand->getValue());
+                            return object(leftValue - rightValue);
+                        }
+                    case TokenType::DOUBLE:
+                        {
+                            ld rightValue = *static_cast<ld *>(rightOperand->getValue());
+                            return object(leftValue - rightValue);
+                        }
+                    case TokenType::IDENTIFIER:
+                        {
+                            //TODO: implement
+                        }
+                }
+                break;
+            }
+
+        case TokenType::DOUBLE:
+            {
+                ld leftValue = *static_cast<ld *>(leftOperand->getValue());
+
+                switch(right) {
+                    case TokenType::INT: 
+                        {
+                            ll rightValue = *static_cast<ll *>(rightOperand->getValue());
+                            return object(leftValue - rightValue);
+                        }
+                    case TokenType::DOUBLE:
+                        {
+                            ld rightValue = *static_cast<ld *>(rightOperand->getValue());
+                            return object(leftValue - rightValue);
+                        }
+                    case TokenType::IDENTIFIER:
+                        {
+                            //TODO: implement
+                        }
+                }
+                break;
+            }
+
+        case TokenType::IDENTIFIER:
+            {
+                //TODO: implementation (get value)
+
+                switch(right) {
+                    case TokenType::INT: 
+                        {
+                            ll rightValue = *static_cast<ll *>(rightOperand->getValue());
+                            //TODO: implement
+                        }
+                    case TokenType::DOUBLE:
+                        {
+                            ld rightValue = *static_cast<ld *>(rightOperand->getValue());
+                            //TODO: implement
+                        }
+                    case TokenType::IDENTIFIER:
+                        {
+                            //TODO: implement
+                        }
+                }
+                break;
+            }
+        
+    }
+    throw UNSUPPORTED_OPERAND_TYPES_ERROR();
 }
 
-object Evaluator::op_star(object *leftOperand, object *rightOperand) {
+object Evaluator::op_star(object *leftOperand, object *rightOperand) { //TODO: add support for string * int, int * string
+    TokenType left = leftOperand->type;
+    TokenType right = rightOperand->type;
 
+    switch(left) {
+        case TokenType::INT:
+            {
+                ll leftValue = *static_cast<ll *>(leftOperand->getValue());
+
+                switch(right) {
+                    case TokenType::INT: 
+                        {
+                            ll rightValue = *static_cast<ll *>(rightOperand->getValue());
+                            return object(leftValue * rightValue);
+                        }
+                    case TokenType::DOUBLE:
+                        {
+                            ld rightValue = *static_cast<ld *>(rightOperand->getValue());
+                            return object(leftValue * rightValue);
+                        }
+                    case TokenType::IDENTIFIER:
+                        {
+                            //TODO: implement
+                        }
+                }
+                break;
+            }
+
+        case TokenType::DOUBLE:
+            {
+                ld leftValue = *static_cast<ld *>(leftOperand->getValue());
+
+                switch(right) {
+                    case TokenType::INT: 
+                        {
+                            ll rightValue = *static_cast<ll *>(rightOperand->getValue());
+                            return object(leftValue * rightValue);
+                        }
+                    case TokenType::DOUBLE:
+                        {
+                            ld rightValue = *static_cast<ld *>(rightOperand->getValue());
+                            return object(leftValue * rightValue);
+                        }
+                    case TokenType::IDENTIFIER:
+                        {
+                            //TODO: implement
+                        }
+                }
+                break;
+            }
+
+        case TokenType::IDENTIFIER:
+            {
+                //TODO: implementation (get value)
+
+                switch(right) {
+                    case TokenType::INT: 
+                        {
+                            ll rightValue = *static_cast<ll *>(rightOperand->getValue());
+                            //TODO: implement
+                        }
+                    case TokenType::DOUBLE:
+                        {
+                            ld rightValue = *static_cast<ld *>(rightOperand->getValue());
+                            //TODO: implement
+                        }
+                    case TokenType::IDENTIFIER:
+                        {
+                            //TODO: implement
+                        }
+                }
+                break;
+            }
+        
+    }
+    throw UNSUPPORTED_OPERAND_TYPES_ERROR();
 }
 
 object Evaluator::op_slash(object *leftOperand, object *rightOperand) {
+    TokenType left = leftOperand->type;
+    TokenType right = rightOperand->type;
 
+    switch(left) {
+        case TokenType::INT:
+            {
+                ll leftValue = *static_cast<ll *>(leftOperand->getValue());
+
+                switch(right) {
+                    case TokenType::INT: 
+                        {
+                            ll rightValue = *static_cast<ll *>(rightOperand->getValue());
+                            return object(leftValue / rightValue);
+                        }
+                    case TokenType::DOUBLE:
+                        {
+                            ld rightValue = *static_cast<ld *>(rightOperand->getValue());
+                            return object(leftValue / rightValue);
+                        }
+                    case TokenType::IDENTIFIER:
+                        {
+                            //TODO: implement
+                        }
+                }
+                break;
+            }
+
+        case TokenType::DOUBLE:
+            {
+                ld leftValue = *static_cast<ld *>(leftOperand->getValue());
+
+                switch(right) {
+                    case TokenType::INT: 
+                        {
+                            ll rightValue = *static_cast<ll *>(rightOperand->getValue());
+                            return object(leftValue / rightValue);
+                        }
+                    case TokenType::DOUBLE:
+                        {
+                            ld rightValue = *static_cast<ld *>(rightOperand->getValue());
+                            return object(leftValue / rightValue);
+                        }
+                    case TokenType::IDENTIFIER:
+                        {
+                            //TODO: implement
+                        }
+                }
+                break;
+            }
+
+        case TokenType::IDENTIFIER:
+            {
+                //TODO: implementation (get value)
+
+                switch(right) {
+                    case TokenType::INT: 
+                        {
+                            ll rightValue = *static_cast<ll *>(rightOperand->getValue());
+                            //TODO: implement
+                        }
+                    case TokenType::DOUBLE:
+                        {
+                            ld rightValue = *static_cast<ld *>(rightOperand->getValue());
+                            //TODO: implement
+                        }
+                    case TokenType::IDENTIFIER:
+                        {
+                            //TODO: implement
+                        }
+                }
+                break;
+            }
+        
+    }
+    throw UNSUPPORTED_OPERAND_TYPES_ERROR();
 }
 
 object Evaluator::op_percent(object *leftOperand, object *rightOperand) {
+    TokenType left = leftOperand->type;
+    TokenType right = rightOperand->type;
 
+    switch(left) {
+        case TokenType::INT:
+            {
+                ll leftValue = *static_cast<ll *>(leftOperand->getValue());
+
+                switch(right) {
+                    case TokenType::INT: 
+                        {
+                            ll rightValue = *static_cast<ll *>(rightOperand->getValue());
+                            return object(leftValue % rightValue);
+                        }
+                    case TokenType::DOUBLE:
+                        {
+                            ld rightValue = *static_cast<ld *>(rightOperand->getValue());
+                            return object(std::fmod(leftValue, rightValue));
+                        }
+                    case TokenType::IDENTIFIER:
+                        {
+                            //TODO: implement
+                        }
+                }
+                break;
+            }
+
+        case TokenType::DOUBLE:
+            {
+                ld leftValue = *static_cast<ld *>(leftOperand->getValue());
+
+                switch(right) {
+                    case TokenType::INT: 
+                        {
+                            ll rightValue = *static_cast<ll *>(rightOperand->getValue());
+                            return object(std::fmod(leftValue, rightValue));
+                        }
+                    case TokenType::DOUBLE:
+                        {
+                            ld rightValue = *static_cast<ld *>(rightOperand->getValue());
+                            return object(std::fmod(leftValue, rightValue));
+                        }
+                    case TokenType::IDENTIFIER:
+                        {
+                            //TODO: implement
+                        }
+                }
+                break;
+            }
+
+        case TokenType::IDENTIFIER:
+            {
+                //TODO: implementation (get value)
+
+                switch(right) {
+                    case TokenType::INT: 
+                        {
+                            ll rightValue = *static_cast<ll *>(rightOperand->getValue());
+                            //TODO: implement
+                        }
+                    case TokenType::DOUBLE:
+                        {
+                            ld rightValue = *static_cast<ld *>(rightOperand->getValue());
+                            //TODO: implement
+                        }
+                    case TokenType::IDENTIFIER:
+                        {
+                            //TODO: implement
+                        }
+                }
+                break;
+            }
+        
+    }
+    throw UNSUPPORTED_OPERAND_TYPES_ERROR();
 }
 
 object Evaluator::op_caret(object *leftOperand, object *rightOperand) {
+    TokenType left = leftOperand->type;
+    TokenType right = rightOperand->type;
 
+    switch(left) {
+        case TokenType::INT:
+            {
+                ll leftValue = *static_cast<ll *>(leftOperand->getValue());
+
+                switch(right) {
+                    case TokenType::INT: //TODO: should int ^ int be an int or double
+                        {
+                            ll rightValue = *static_cast<ll *>(rightOperand->getValue());
+                            return object(static_cast<ld>(std::pow(leftValue, rightValue)));
+                        }
+                    case TokenType::DOUBLE:
+                        {
+                            ld rightValue = *static_cast<ld *>(rightOperand->getValue());
+                            return object(static_cast<ld>(std::pow(leftValue, rightValue)));
+                        }
+                    case TokenType::IDENTIFIER:
+                        {
+                            //TODO: implement
+                        }
+                }
+                break;
+            }
+
+        case TokenType::DOUBLE:
+            {
+                ld leftValue = *static_cast<ld *>(leftOperand->getValue());
+
+                switch(right) {
+                    case TokenType::INT: 
+                        {
+                            ll rightValue = *static_cast<ll *>(rightOperand->getValue());
+                            return object(static_cast<ld>(std::pow(leftValue, rightValue)));
+                        }
+                    case TokenType::DOUBLE:
+                        {
+                            ld rightValue = *static_cast<ld *>(rightOperand->getValue());
+                            return object(static_cast<ld>(std::pow(leftValue, rightValue)));
+                        }
+                    case TokenType::IDENTIFIER:
+                        {
+                            //TODO: implement
+                        }
+                }
+                break;
+            }
+
+        case TokenType::IDENTIFIER:
+            {
+                //TODO: implementation (get value)
+
+                switch(right) {
+                    case TokenType::INT: 
+                        {
+                            ll rightValue = *static_cast<ll *>(rightOperand->getValue());
+                            //TODO: implement
+                        }
+                    case TokenType::DOUBLE:
+                        {
+                            ld rightValue = *static_cast<ld *>(rightOperand->getValue());
+                            //TODO: implement
+                        }
+                    case TokenType::IDENTIFIER:
+                        {
+                            //TODO: implement
+                        }
+                }
+                break;
+            }
+        
+    }
+    throw UNSUPPORTED_OPERAND_TYPES_ERROR();
 }
 
-object Evaluator::op_greater(object *leftOperand, object *rightOperand) {
+object Evaluator::op_greater(object *leftOperand, object *rightOperand) { // make sure to include true and false token types
 
 }
 

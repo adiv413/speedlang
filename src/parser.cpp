@@ -42,9 +42,21 @@ ExprPtr Parser::parseExpression() {
 }
 
 ExprPtr Parser::addOr() {
-    ExprPtr expr(std::move(addAnd()));
+    ExprPtr expr(std::move(addXor()));
 
     while(matchesOperators({TokenType::OR})) {
+        TokenPtr op(new Token(tokens[cursor++]));
+        ExprPtr right(std::move(addXor()));
+        expr = std::make_unique<Expression>(std::move(expr), std::move(right), std::move(op));
+    }
+
+    return std::move(expr);
+}
+
+ExprPtr Parser::addXor() {
+    ExprPtr expr(std::move(addAnd()));
+
+    while(matchesOperators({TokenType::XOR})) {
         TokenPtr op(new Token(tokens[cursor++]));
         ExprPtr right(std::move(addAnd()));
         expr = std::make_unique<Expression>(std::move(expr), std::move(right), std::move(op));

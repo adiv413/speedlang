@@ -33,6 +33,7 @@ class Parser {
             */
         ExprPtr parseExpression();
         ExprPtr addOr();
+        ExprPtr addXor();
         ExprPtr addAnd();
         ExprPtr addEquality();
         ExprPtr addComparison();
