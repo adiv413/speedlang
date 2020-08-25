@@ -19,6 +19,7 @@ class object {
         object(double d) : type_ptr(new double_t(d)), type(TokenType::DOUBLE) {}
         object(bool b) : type_ptr(new bool_t(b)), type(b ? TokenType::TRUE : TokenType::FALSE) {}
         object(std::string s) : type_ptr(new string_t(s)), type(TokenType::STRING) {}
+        object(std::nullptr_t n) : type_ptr(n), type(TokenType::NULL_T) {}
         virtual void* getValue();
 };
 

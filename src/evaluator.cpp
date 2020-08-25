@@ -178,33 +178,38 @@ object Evaluator::op_binary_plus(object *leftOperand, object *rightOperand) {
                         }
                     case TokenType::NULL_T:
                         {
-                            return leftValue + token_type_to_string_map.at(TokenType::NULL_T);
+                            return object(leftValue + token_type_to_string_map.at(TokenType::NULL_T));
                         }
                 }
                 break;
             }
         case TokenType::INT:
            { 
+               int leftValue = *static_cast<int *>(leftOperand->getValue());
+
                switch(right) {
                     case TokenType::STRING: 
                         {
-
+                            std::string rightValue = *static_cast<std::string *>(rightOperand->getValue());
+                            return object(std::to_string(leftValue) + rightValue);
                         }
                     case TokenType::INT: 
                         {
-
+                            int rightValue = *static_cast<int *>(rightOperand->getValue());
+                            return object(leftValue + rightValue);
                         }
                     case TokenType::DOUBLE: 
                         {
-
+                            double rightValue = *static_cast<double *>(rightOperand->getValue());
+                            return object(leftValue + rightValue);
                         }
                     case TokenType::IDENTIFIER: 
                         {
-
+                            //TODO: implement
                         }
                     case TokenType::NULL_T: 
                         {
-
+                            throw UNSUPPORTED_OPERAND_TYPES_ERROR();
                         }
                 }
                 break;
@@ -212,53 +217,58 @@ object Evaluator::op_binary_plus(object *leftOperand, object *rightOperand) {
 
         case TokenType::DOUBLE:
             {
+                double leftValue = *static_cast<double *>(rightOperand->getValue());
+
                 switch(right) {
                     case TokenType::STRING: 
                         {
-
+                            std::string rightValue = *static_cast<std::string *>(rightOperand->getValue());
+                            return object(std::to_string(leftValue) + rightValue);
                         }
                     case TokenType::INT: 
                         {
-
+                            int rightValue = *static_cast<int *>(rightOperand->getValue());
+                            return object(leftValue + rightValue);
                         }
                     case TokenType::DOUBLE: 
                         {
-
+                            double rightValue = *static_cast<double *>(rightOperand->getValue());
+                            return object(leftValue + rightValue);
                         }
                     case TokenType::IDENTIFIER: 
                         {
-
+                            //TODO: implement
                         }
                     case TokenType::NULL_T: 
                         {
-
+                            throw UNSUPPORTED_OPERAND_TYPES_ERROR();
                         }
                 }
                 break;
             }
 
-        case TokenType::IDENTIFIER:
+        case TokenType::IDENTIFIER: //TODO: implement
             {
                 switch(right) {
                     case TokenType::STRING: 
                         {
-
+                            std::string rightValue = *static_cast<std::string *>(rightOperand->getValue());
                         }
                     case TokenType::INT: 
                         {
-
+                            int rightValue = *static_cast<int *>(rightOperand->getValue());
                         }
                     case TokenType::DOUBLE: 
                         {
-
+                            double rightValue = *static_cast<double *>(rightOperand->getValue());
                         }
                     case TokenType::IDENTIFIER: 
                         {
-
+                            //TODO: implement
                         }
                     case TokenType::NULL_T: 
                         {
-
+                            //TODO: implement (if its a string then its good)
                         }
                 }
                 break;
@@ -269,23 +279,24 @@ object Evaluator::op_binary_plus(object *leftOperand, object *rightOperand) {
                 switch(right) {
                     case TokenType::STRING: 
                         {
-
-                        }   
+                            std::string rightValue = *static_cast<std::string *>(rightOperand->getValue());
+                            return object(token_type_to_string_map.at(TokenType::NULL_T) + rightValue);
+                        }
                     case TokenType::INT: 
                         {
-
+                            throw UNSUPPORTED_OPERAND_TYPES_ERROR();
                         }
                     case TokenType::DOUBLE: 
                         {
-
+                            throw UNSUPPORTED_OPERAND_TYPES_ERROR();
                         }
                     case TokenType::IDENTIFIER: 
                         {
-
+                            //TODO: implement
                         }
                     case TokenType::NULL_T: 
                         {
-
+                            return object(nullptr);
                         }
                 }
                 break;

@@ -47,7 +47,8 @@ object::object(Token *t) {
 }
 
 void* object::getValue() {
-    return type_ptr->getValue();
+    if(type_ptr) return type_ptr->getValue();
+    else return nullptr;
 }
 
 void* int_t::getValue() {
