@@ -18,11 +18,11 @@ class object {
 
         object();
         object(Token *t);
-        object(ll i) : type_ptr(new int_t(i)), type(TokenType::INT) {}
-        object(ld d) : type_ptr(new double_t(d)), type(TokenType::DOUBLE) {}
-        object(bool b) : type_ptr(new bool_t(b)), type(b ? TokenType::TRUE : TokenType::FALSE) {}
-        object(std::string s) : type_ptr(new string_t(s)), type(TokenType::STRING) {}
-        object(std::nullptr_t n) : type_ptr(n), type(TokenType::NULL_T) {}
+        object(ll i);
+        object(ld d);
+        object(bool b);
+        object(std::string s);
+        object(std::nullptr_t n);
         virtual void* getValue();
 };
 
@@ -42,11 +42,11 @@ class bool_t : public object {
         void* getValue() override;
 };
 
-class double_t : public object { 
+class ldouble_t : public object { 
     public:
         ld value;
         
-        double_t(ld d) : value(d) {}
+        ldouble_t(ld d) : value(d) {}
         void* getValue() override;
 };
 

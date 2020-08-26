@@ -97,8 +97,10 @@ object Evaluator::op_unary_plus(object *operand) {
 
     switch(op) {
         case TokenType::INT:
-            ll ret = *static_cast<ll *>(operand->getValue());
-            return object(ret >= 0 ? ret : -ret);
+            {
+                ll ret = *static_cast<ll *>(operand->getValue());
+                return object(ret >= 0 ? ret : -ret);
+            }
         case TokenType::DOUBLE:
             return object(std::fabs(*static_cast<ld *>(operand->getValue())));
         case TokenType::IDENTIFIER:

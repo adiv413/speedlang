@@ -3,12 +3,14 @@
 #include <string>
 #include "scanner.hpp"
 #include "parser.hpp"
+#include "evaluator.hpp"
 
 using namespace std;
 
 void runREPL();
 void runFile(char *filename);
 string get_file_contents(char *filename);
+void printResult(object *o);
 
 int main(int argc, char **argv) {
     if(argc > 2) {
@@ -35,8 +37,6 @@ void runREPL() {
         getline(cin, line);
         line += '\n';
 
-        cout << line << endl;
-
         if(line == "exit") {
             break;
         }
@@ -44,21 +44,29 @@ void runREPL() {
         Scanner sc(filename, line);
         vector<Token> tokens = sc.scan_file_contents();
 
-        for(auto token : tokens) {
-            cout << token.value << " ";
-        }
+        // for(auto token : tokens) {
+        //     cout << token.value << " ";
+        // }
 
-        cout << "\n\n\n";
+        // cout << "\n\n\n";
 
         if(tokens.size() != 0) {
             Parser p(tokens, line, filename);
             p.parseTokens();
             if(!p.errorOccurred) {
-                for(int i = 0; i < p.expressions.size(); i++) {
-                    p.print(p.expressions[i].get(), 0);
+                // for(int i = 0; i < p.expressions.size(); i++) {
+                //     p.print(p.expressions[i].get(), 0);
+                // }
+
+                Evaluator e(&p.expressions, filename, line);
+                vector<object> results = e.evaluate();
+
+                for(int i = 0; i < results.size(); i++) {
+                    object *o = &results[i];
+
+                    printResult(o);
                 }
             }
-            //execute_code
         }
     }
 
@@ -81,21 +89,28 @@ void runFile(char *filename) {
         Scanner sc(string(filename), contents);
         vector<Token> tokens = sc.scan_file_contents();
 
-        for(auto token : tokens) {
-            cout << token.value << " ";
-        }
+        // for(auto token : tokens) {
+        //     cout << token.value << " ";
+        // }
 
-        cout << "\n\n\n";
+        // cout << "\n\n\n";
 
         if(tokens.size() != 0) {
             Parser p(tokens, contents, filename);
             p.parseTokens();
             if(!p.errorOccurred) {
-                for(int i = 0; i < p.expressions.size(); i++) {
-                    p.print(p.expressions[i].get(), 0);
-                }
+                // for(int i = 0; i < p.expressions.size(); i++) {
+                //     p.print(p.expressions[i].get(), 0);
+                // }
 
-                //execute_code
+                Evaluator e(&p.expressions, filename, contents);
+                vector<object> results = e.evaluate();
+
+                for(int i = 0; i < results.size(); i++) {
+                    object *o = &results[i];
+
+                    printResult(o);
+                }
             }
         }
     }
@@ -125,4 +140,27 @@ string get_file_contents(char *filename) {
     }
 
     return ""; 
+}
+
+void printResult(object *o) {
+    switch(o->type) {
+        case TokenType::INT:
+            cout << *static_cast<ll *>(o->getValue()) << "\n";
+            break;
+        case TokenType::DOUBLE:
+            cout << *static_cast<ld *>(o->getValue()) << "\n";
+            break;
+        case TokenType::STRING:
+            cout << *static_cast<string *>(o->getValue()) << "\n";
+            break;
+        case TokenType::TRUE:
+            cout << "true" << "\n";
+            break;
+        case TokenType::FALSE:
+            cout << "false" << "\n";
+            break;
+        case TokenType::NULL_T:
+            cout << "null" << "\n";
+            break;
+    }
 }
