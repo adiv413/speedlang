@@ -1,7 +1,5 @@
 #include "parser.hpp"
 
-//TODO: do evaluate() in expression.cpp
-
 void Parser::parseTokens() { 
     while(cursor < tokens.size()) {
         if(tokens[cursor].token_type == TokenType::NEWLINE || tokens[cursor].token_type == TokenType::SEMICOLON) cursor++;
@@ -9,6 +7,7 @@ void Parser::parseTokens() {
             try {
                 expressions.push_back(parseExpression());
 
+                //TODO: fix this
                 // this if statement is necessary because expressions like 5 + 3 - 2 2 - 3 are legal otherwise
                 // those multiple-expressions-in-one-line expressions are evaluated as separate expressions 
                 // (e.g. 5 + 3 - 2 and 2 - 3), and are dangerous because they cause ambiguity when dealing with

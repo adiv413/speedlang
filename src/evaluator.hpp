@@ -49,7 +49,11 @@ class Evaluator {
             {TokenType::GREATER, &op_greater},
             {TokenType::LESS, &op_less},
             {TokenType::GREATER_EQUAL, &op_greater_equal},
-            {TokenType::LESS_EQUAL, &op_less_equal}
+            {TokenType::LESS_EQUAL, &op_less_equal},
+            {TokenType::EQUAL_EQUAL, &op_equal_equal},
+            {TokenType::NOT_EQUAL, &op_not_equal},
+            {TokenType::AND, &op_and},
+            {TokenType::OR, &op_or}
         };
 
         object evaluateExpression(ExprPtr *expr);
@@ -76,6 +80,10 @@ class Evaluator {
         object op_less(object *leftOperand, object *rightOperand);
         object op_greater_equal(object *leftOperand, object *rightOperand);
         object op_less_equal(object *leftOperand, object *rightOperand);
+        object op_equal_equal(object *leftOperand, object *rightOperand);
+        object op_not_equal(object *leftOperand, object *rightOperand);
+        object op_and(object *leftOperand, object *rightOperand);
+        object op_or(object *leftOperand, object *rightOperand);
 
         void addError(Token *t, std::string e_type, std::string e_desc);
 

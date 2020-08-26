@@ -42,7 +42,7 @@ object::object(Token *t) {
             }
         default:
             break;
-            //TODO: throw an error or smth
+            //TODO: throw a BAD_ENUM_VALUE error or smth
     }
 }
 
