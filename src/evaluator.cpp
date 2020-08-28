@@ -14,7 +14,7 @@ std::vector<object> Evaluator::evaluate() {
             currentError = nullptr;
         }
         else {
-            std::cerr << "RuntimeError: " << e.what();
+            std::cerr << "RuntimeError: " << e.what() << "\n";
         }
     }
 
@@ -26,6 +26,10 @@ object Evaluator::evaluateExpression(ExprPtr *expr) {
     if(!expr->get()->left && !expr->get()->right) {
         return object(expr->get()->op.get());
     }
+    // evaluate parentheses
+    else if(expr->get()->op.get()->token_type == TokenType::LEFT_PAREN) {
+        return evaluateExpression(&expr->get()->right);
+    }
     //postfix unary operator, only right is nullptr
     else if(expr->get()->left && !expr->get()->right) {
         return evaluateUnary(expr->get()->op.get(), evaluateExpression(&expr->get()->left));
@@ -35,7 +39,7 @@ object Evaluator::evaluateExpression(ExprPtr *expr) {
         return evaluateUnary(expr->get()->op.get(), evaluateExpression(&expr->get()->right));
     }
     else {
-        return evaluateBinary(expr->get()->op.get(), evaluateExpression(&expr->get()->left), evaluateExpression(&expr->get()->left));
+        return evaluateBinary(expr->get()->op.get(), evaluateExpression(&expr->get()->left), evaluateExpression(&expr->get()->right));
     }
 }
 
@@ -67,7 +71,7 @@ object Evaluator::evaluateBinary(Token *op, object leftOperand, object rightOper
             token_type_to_string_map.find(rightOperand.type) != token_type_to_string_map.end()) {
 
             addError(op, "RuntimeError", "operator '" + op->value + "' does not support operand types '" + 
-            token_type_to_string_map.at(leftOperand.type) + "', '" + 
+            token_type_to_string_map.at(leftOperand.type) + "' and '" + 
             token_type_to_string_map.at(rightOperand.type) + "'");
         }
         throw UNSUPPORTED_OPERAND_TYPES_ERROR();
@@ -370,6 +374,22 @@ object Evaluator::op_star(object *leftOperand, object *rightOperand) { //TODO: a
     TokenType right = rightOperand->type;
 
     switch(left) {
+        case TokenType::STRING: 
+            {
+                std::string leftValue = *static_cast<std::string *>(leftOperand->getValue());
+                switch(right) {
+                    case TokenType::INT:
+                        {
+                            ll rightValue = *static_cast<ll *>(rightOperand->getValue());
+                            std::string ret = leftValue;
+                            
+                            for(int i = 1; i < rightValue; i++) ret += leftValue;
+                            return object(ret);
+                        }
+                }
+                break;
+            }
+
         case TokenType::INT:
             {
                 ll leftValue = *static_cast<ll *>(leftOperand->getValue());
@@ -384,6 +404,14 @@ object Evaluator::op_star(object *leftOperand, object *rightOperand) { //TODO: a
                         {
                             ld rightValue = *static_cast<ld *>(rightOperand->getValue());
                             return object(leftValue * rightValue);
+                        }
+                    case TokenType::STRING:
+                        {
+                            std::string rightValue = *static_cast<std::string *>(rightOperand->getValue());
+                            std::string ret = rightValue;
+                            
+                            for(int i = 1; i < leftValue; i++) ret += rightValue;
+                            return object(ret);
                         }
                     case TokenType::IDENTIFIER:
                         {
@@ -1048,6 +1076,57 @@ object Evaluator::op_or(object *leftOperand, object *rightOperand) {
     switch(left) {
         case TokenType::TRUE:
             return object(true);
+        case TokenType::NULL_T:
+        case TokenType::FALSE:
+            {
+                switch(right) {
+                    case TokenType::TRUE:
+                        return object(true);
+                    case TokenType::NULL_T:
+                    case TokenType::FALSE:
+                        return object(false);
+                    case TokenType::IDENTIFIER: 
+                        {
+                            //TODO: implement
+                        }
+                }
+                break;
+            }
+
+        case TokenType::IDENTIFIER: //TODO: implement
+            {
+                switch(right) {
+                    case TokenType::IDENTIFIER: 
+                        {
+                            //TODO: implement
+                        }
+                }
+                break;
+            }
+    }
+    throw UNSUPPORTED_OPERAND_TYPES_ERROR();
+}
+
+object Evaluator::op_xor(object *leftOperand, object *rightOperand) {
+    TokenType left = leftOperand->type;
+    TokenType right = rightOperand->type;
+
+    switch(left) {
+        case TokenType::TRUE:
+            {
+                switch(right) {
+                    case TokenType::TRUE:
+                        return object(false);
+                    case TokenType::NULL_T:
+                    case TokenType::FALSE:
+                        return object(true);
+                    case TokenType::IDENTIFIER: 
+                        {
+                            //TODO: implement
+                        }
+                }
+                break;
+            }
         case TokenType::NULL_T:
         case TokenType::FALSE:
             {

@@ -53,7 +53,8 @@ class Evaluator {
             {TokenType::EQUAL_EQUAL, &op_equal_equal},
             {TokenType::NOT_EQUAL, &op_not_equal},
             {TokenType::AND, &op_and},
-            {TokenType::OR, &op_or}
+            {TokenType::OR, &op_or},
+            {TokenType::XOR, &op_xor}
         };
 
         object evaluateExpression(ExprPtr *expr);
@@ -84,6 +85,7 @@ class Evaluator {
         object op_not_equal(object *leftOperand, object *rightOperand);
         object op_and(object *leftOperand, object *rightOperand);
         object op_or(object *leftOperand, object *rightOperand);
+        object op_xor(object *leftOperand, object *rightOperand);
 
         void addError(Token *t, std::string e_type, std::string e_desc);
 
