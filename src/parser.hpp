@@ -52,7 +52,7 @@ class Parser {
 
     public:
         bool errorOccurred;
-        std::vector<Statement> statements;
+        std::vector<ExprPtr> expressions;
 
         Parser(std::vector<Token> t, std::string con, std::string file) 
         : tokens(t), filename(file), contents(con), errorOccurred(false), cursor(0) {}

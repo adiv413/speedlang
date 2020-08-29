@@ -44,11 +44,11 @@ void runREPL() {
         Scanner sc(filename, line);
         vector<Token> tokens = sc.scan_file_contents();
 
-        for(auto token : tokens) {
-            cout << token.value << " ";
-        }
+        // for(auto token : tokens) {
+        //     cout << token.value << " ";
+        // }
 
-        cout << "\n\n\n";
+        // cout << "\n\n\n";
 
         if(tokens.size() != 0) {
             Parser p(tokens, line, filename);
@@ -58,7 +58,7 @@ void runREPL() {
                 //     p.print(static_cast<ExprStmt *>(&p.statements[i])->expression.get(), 0);
                 // }
 
-                Evaluator e(&p.statements, filename, line);
+                Evaluator e(&p.expressions, filename, line);
                 vector<object> results = e.evaluate();
 
                 for(int i = 0; i < results.size(); i++) {
@@ -103,7 +103,7 @@ void runFile(char *filename) {
                 //     p.print(p.statements[i].get(), 0);
                 // }
 
-                Evaluator e(&p.statements, filename, contents);
+                Evaluator e(&p.expressions, filename, contents);
                 vector<object> results = e.evaluate();
 
                 for(int i = 0; i < results.size(); i++) {

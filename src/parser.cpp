@@ -5,7 +5,7 @@ void Parser::parseTokens() {
         if(tokens[cursor].token_type == TokenType::NEWLINE || tokens[cursor].token_type == TokenType::SEMICOLON) cursor++;
         else {
             try {
-                statements.push_back(ExprStmt(std::move(parseExpression())));
+                expressions.push_back(std::move(parseExpression()));
                 // this only applies for expression statements, you don't need a line separator after stuff like if statements
 
                 if(cursor < tokens.size() && tokens[cursor].token_type != TokenType::NEWLINE && 

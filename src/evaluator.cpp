@@ -4,8 +4,8 @@ std::vector<object> Evaluator::evaluate() {
     std::vector<object> ret;
 
     try {
-        for(int i = 0; i < statements->size(); i++) { 
-            ret.push_back(evaluateStatement(&statements->at(i))); 
+        for(int i = 0; i < expressions->size(); i++) { 
+            ret.push_back(evaluateExpression(&expressions->at(i))); 
         }
     }
     catch(const std::exception &e) {
@@ -21,20 +21,18 @@ std::vector<object> Evaluator::evaluate() {
     return ret;
 }
 
-object Evaluator::evaluateStatement(Statement *stmt) {
-    switch(stmt->type) {
-        case StatementType::EXPRESSION:
-            {
-                return evaluateExpression(&static_cast<ExprStmt *>(stmt)->expression);
-            }
-    }
+// object Evaluator::evaluateStatement(Statement *stmt) {
+//     switch(stmt->type) {
+//         case StatementType::EXPRESSION:
+//             {
+//                 return evaluateExpression(&static_cast<ExprStmt *>(stmt)->expression);
+//             }
+//     }
 
-    throw BAD_STATEMENT_TYPE_INTERNAL_ERROR();
-}
+//     throw BAD_STATEMENT_TYPE_INTERNAL_ERROR();
+// }
 
 object Evaluator::evaluateExpression(ExprPtr *expr) { 
-    if(expr->get()->op) std::cout << "1231231232132131";
-    else std::cout << ":((((((";
     // if the expression is an operand, return the operand literal
     //TODO: identifiers
     if(!expr->get()->left && !expr->get()->right) {
@@ -74,7 +72,6 @@ object Evaluator::evaluateUnary(Token *op, object operand) {
 }
 
 object Evaluator::evaluateBinary(Token *op, object leftOperand, object rightOperand) {
-    std::cout << "sdf;lsdl;fksd;flksdf;lksdfl;lk";
     TokenType op_type = op->token_type;
 
     try {

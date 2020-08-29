@@ -1,5 +1,5 @@
-#include "statement.hpp"
+// #include "statement.hpp"
 
-ExprStmt::ExprStmt(ExprPtr e) : expression(std::move(e)) {
-    type = StatementType::EXPRESSION;
-}
+// ExprStmt::ExprStmt(ExprPtr e) : expression(std::move(e)) {
+//     type = StatementType::EXPRESSION;
+// }
