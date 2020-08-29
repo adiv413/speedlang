@@ -25,6 +25,8 @@ enum class TokenType {
     SEMICOLON,
     DOT,
     COMMA,
+    NEWLINE,
+    BACKSLASH,
 
     //two character token types
 
@@ -65,8 +67,8 @@ enum class TokenType {
     CLASS,
     PUBLIC,
     PRIVATE,
-    STATIC
-
+    STATIC,
+    NULL_T
 };
 
 #endif

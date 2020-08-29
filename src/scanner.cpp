@@ -1,10 +1,9 @@
 #include "scanner.hpp"
 
 Scanner::Scanner(std::string file, std::string raw_contents) 
-: contents(raw_contents), cursor(0), line(0), length(raw_contents.length()), line_begin(0), filename(file), errorOccurred(false) {}
+: contents(raw_contents), cursor(0), line(1), length(raw_contents.length()), line_begin(0), filename(file), errorOccurred(false) {}
 
 std::vector<Token> Scanner::scan_file_contents() {
-
     while(cursor < length) {
         char current = contents[cursor];
 
@@ -19,6 +18,14 @@ std::vector<Token> Scanner::scan_file_contents() {
                 cursor++;
                 break;
             case '\n':
+                if(tokens.size() != 0 && tokens.back().token_type != TokenType::BACKSLASH) {
+                    add_single_char_token(TokenType::NEWLINE);
+                    line++;
+                    line_begin = cursor;
+                    break;
+                }
+                else if(tokens.size() != 0 && tokens.back().token_type == TokenType::BACKSLASH) tokens.pop_back();
+
                 line++;
                 cursor++;
                 line_begin = cursor;
@@ -42,7 +49,8 @@ std::vector<Token> Scanner::scan_file_contents() {
                 break;
             case '/':
                 if(check_next_character('=', TokenType::SLASH_EQUAL));
-                else if(cursor + 1 < length && contents[cursor + 1] == '/') while(contents[cursor + 1] != '\n') cursor++; // comment case: "//"
+                else if(cursor + 1 < length && contents[cursor + 1] == '/') while(cursor < length && contents[cursor] != '\n') cursor++; // comment case: "//"
+                else if(cursor + 1 < length && contents[cursor + 1] == '*') parse_block_comment();
                 else add_single_char_token(TokenType::SLASH);
                 break;
             case '%':
@@ -96,6 +104,9 @@ std::vector<Token> Scanner::scan_file_contents() {
             case ';':
                 add_single_char_token(TokenType::SEMICOLON);
                 break;
+            case '\\':
+                add_single_char_token(TokenType::BACKSLASH);
+                break;
             case '.':
                 if(cursor + 1 < length && '0' <= contents[cursor + 1] && contents[cursor + 1] <= '9') add_number();
                 else add_single_char_token(TokenType::DOT);
@@ -125,6 +136,8 @@ std::vector<Token> Scanner::scan_file_contents() {
     for(auto error : errors) {
         error.print();
     }
+
+    removeDuplicateNewlines();
 
     return tokens;
 }
@@ -175,6 +188,12 @@ void Scanner::add_number() {
     char curr = contents[cursor];
 
     while(cursor < length && ('0' <= curr && curr <= '9' || curr == '.')) {
+        // if there are multiple dots in one double
+        if(curr == '.' && isDouble) {
+            add_error("SyntaxError", "Invalid double declaration", cursor - line_begin);
+            while(cursor < length && ('0' <= curr && curr <= '9' || curr == '.')) curr = contents[++cursor];
+            return;
+        }
         if(curr == '.') isDouble = true;
         curr = contents[++cursor];
     }
@@ -195,7 +214,7 @@ void Scanner::add_number() {
 void Scanner::add_identifier() {
     int start = cursor;
 
-    while(check_identifier(contents[cursor])) cursor++;
+    while(cursor < length && check_identifier(contents[cursor])) cursor++;
     std::string identifier_name(contents, start, cursor - start);
 
     if(reserved_keywords.find(identifier_name) != reserved_keywords.end()) {
@@ -206,6 +225,7 @@ void Scanner::add_identifier() {
     }
 }
 
+// note: col is the distance from the beginning of the line to the current position
 void Scanner::add_error(std::string e_type, std::string e_desc, int col) {
     int line_end = line_begin;
     while(line_end < length && contents[line_end] != '\n') line_end++;
@@ -216,5 +236,41 @@ void Scanner::add_error(std::string e_type, std::string e_desc, int col) {
 }
 
 bool Scanner::check_identifier(char c) {
-    return isalpha(c) || c == '_' || c == '$' || c == '-';
+    return isalpha(c) || c == '_' || c == '$' || c == '-' || ('0' <= c && c <= '9');
+}
+
+void Scanner::parse_block_comment() {
+    int blk_com_begin = cursor - line_begin;
+    int num_newlines = 0;
+    int temp_line_begin = line_begin;
+
+    while(cursor + 1 < length && contents.substr(cursor, 2) != "*/") {
+        if(contents[cursor] == '\n') {
+            num_newlines++;
+            temp_line_begin = cursor + 1;
+        }
+        cursor++;
+    }
+
+    if(cursor + 1 >= length && contents.substr(contents.length() - 2, 2) != "*/") {
+        add_error("SyntaxError", "Unclosed block comment at end of file", blk_com_begin);
+    }
+
+    line += num_newlines;
+    line_begin = temp_line_begin;
+    cursor += 2;
+}
+
+void Scanner::removeDuplicateNewlines() {
+    TokenType target = TokenType::NEWLINE;
+    
+    int curr = 0;
+    while(curr < tokens.size()) {
+        if(curr + 1 < tokens.size() && tokens[curr].token_type == target && tokens[curr + 1].token_type == target) {
+            int end = ++curr;
+            while(end < tokens.size() && tokens[end].token_type == target) end++;
+            tokens.erase(tokens.begin() + curr, tokens.begin() + end);
+        }
+        curr++;
+    }
 }

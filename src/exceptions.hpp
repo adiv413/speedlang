@@ -17,4 +17,69 @@ class FILE_NOT_FOUND_EXCEPTION : public std::exception {
         }
 };
 
+class UNCLOSED_PARENTHETICAL_SYNTAX_ERROR : public std::exception {
+    private:
+        std::string message;
+    public:
+        UNCLOSED_PARENTHETICAL_SYNTAX_ERROR() 
+        : message("Expected ')' to close parenthetical expression") {}
+
+        virtual const char* what() const throw()
+        {
+            return this->message.c_str();
+        }
+};
+
+class EXPECTED_EXPRESSION_SYNTAX_ERROR : public std::exception {
+    private:
+        std::string message;
+    public:
+        EXPECTED_EXPRESSION_SYNTAX_ERROR() 
+        : message("Expected expression; current token cannot start an expression") {}
+
+        virtual const char* what() const throw()
+        {
+            return this->message.c_str();
+        }
+};
+
+class MISSING_LINE_SEPARATOR_SYNTAX_ERROR : public std::exception {
+    private:
+        std::string message;
+    public:
+        MISSING_LINE_SEPARATOR_SYNTAX_ERROR() 
+        : message("Expected semicolon or newline after expression") {}
+
+        virtual const char* what() const throw()
+        {
+            return this->message.c_str();
+        }
+};
+
+class UNSUPPORTED_OPERAND_TYPES_ERROR : public std::exception {
+    private:
+        std::string message;
+    public:
+        UNSUPPORTED_OPERAND_TYPES_ERROR() 
+        : message("Unsupported operand type(s) for operator") {}
+
+        virtual const char* what() const throw()
+        {
+            return this->message.c_str();
+        }
+};
+
+class BAD_STATEMENT_TYPE_INTERNAL_ERROR : public std::exception {
+    private:
+        std::string message;
+    public:
+        BAD_STATEMENT_TYPE_INTERNAL_ERROR() 
+        : message("Internal error: bad statement type") {}
+
+        virtual const char* what() const throw()
+        {
+            return this->message.c_str();
+        }
+};
+
 #endif

@@ -19,9 +19,10 @@ class Scanner {
         std::string filename;
         std::vector<Token> tokens;
         std::vector<Error> errors;
-        std::unordered_map<std::string, TokenType> reserved_keywords = {
+        const std::unordered_map<std::string, TokenType> reserved_keywords = {
             {"and", TokenType::AND},
             {"or", TokenType::OR},
+            {"not", TokenType::NOT},
             {"xor", TokenType::XOR},
             {"if", TokenType::IF},
             {"else", TokenType::ELSE},
@@ -35,7 +36,8 @@ class Scanner {
             {"class", TokenType::CLASS},
             {"public", TokenType::PUBLIC},
             {"private", TokenType::PRIVATE},
-            {"static", TokenType::STATIC}
+            {"static", TokenType::STATIC},
+            {"null", TokenType::NULL_T}
         };
 
         bool check_next_character(char next_char, TokenType type);
@@ -45,6 +47,8 @@ class Scanner {
         void add_number();
         void add_identifier();
         void add_error(std::string e_type, std::string e_desc, int col);
+        void parse_block_comment();
+        void removeDuplicateNewlines();
 
     public:
         Scanner(std::string file, std::string raw_contents);
