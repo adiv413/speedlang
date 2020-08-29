@@ -5,6 +5,7 @@
 #include "expression.hpp"
 #include "exceptions.hpp"
 #include "error.hpp"
+#include "statement.hpp"
 #include <vector>
 
 class Parser {
@@ -32,6 +33,7 @@ class Parser {
             return condition  
             */
         ExprPtr parseExpression();
+        ExprPtr addAssignment();
         ExprPtr addOr();
         ExprPtr addXor();
         ExprPtr addAnd();
@@ -50,7 +52,7 @@ class Parser {
 
     public:
         bool errorOccurred;
-        std::vector<ExprPtr> expressions;
+        std::vector<Statement> statements;
 
         Parser(std::vector<Token> t, std::string con, std::string file) 
         : tokens(t), filename(file), contents(con), errorOccurred(false), cursor(0) {}

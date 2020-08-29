@@ -69,4 +69,17 @@ class UNSUPPORTED_OPERAND_TYPES_ERROR : public std::exception {
         }
 };
 
+class BAD_STATEMENT_TYPE_INTERNAL_ERROR : public std::exception {
+    private:
+        std::string message;
+    public:
+        BAD_STATEMENT_TYPE_INTERNAL_ERROR() 
+        : message("Internal error: bad statement type") {}
+
+        virtual const char* what() const throw()
+        {
+            return this->message.c_str();
+        }
+};
+
 #endif

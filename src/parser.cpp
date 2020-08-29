@@ -5,20 +5,15 @@ void Parser::parseTokens() {
         if(tokens[cursor].token_type == TokenType::NEWLINE || tokens[cursor].token_type == TokenType::SEMICOLON) cursor++;
         else {
             try {
-                expressions.push_back(parseExpression());
+                statements.push_back(ExprStmt(std::move(parseExpression())));
+                // this only applies for expression statements, you don't need a line separator after stuff like if statements
 
-                //TODO: fix this
-                // this if statement is necessary because expressions like 5 + 3 - 2 2 - 3 are legal otherwise
-                // those multiple-expressions-in-one-line expressions are evaluated as separate expressions 
-                // (e.g. 5 + 3 - 2 and 2 - 3), and are dangerous because they cause ambiguity when dealing with
-                // longer and more complex expressions
-                
-                // if(cursor < tokens.size() && tokens[cursor].token_type != TokenType::NEWLINE && 
-                //     tokens[cursor].token_type != TokenType::SEMICOLON) {
+                if(cursor < tokens.size() && tokens[cursor].token_type != TokenType::NEWLINE && 
+                    tokens[cursor].token_type != TokenType::SEMICOLON) {
 
-                //     addError("SyntaxError", "Expected semicolon or newline after end of expression");
-                //     throw MISSING_LINE_SEPARATOR_SYNTAX_ERROR();
-                // }
+                    addError("SyntaxError", "Expected semicolon or newline after end of expression");
+                    throw MISSING_LINE_SEPARATOR_SYNTAX_ERROR();
+                }
             }
             catch(const std::exception &e) {
                 if(currentError) {
@@ -26,7 +21,7 @@ void Parser::parseTokens() {
                     currentError = nullptr;
                 }
                 else {
-                    addError("SyntaxError", "");
+                    addError("SyntaxError", e.what());
                     currentError->print();
                     currentError = nullptr;
                 }
@@ -37,7 +32,19 @@ void Parser::parseTokens() {
 }
 
 ExprPtr Parser::parseExpression() {
-    return std::move(addOr());
+    return std::move(addAssignment());
+}
+
+ExprPtr Parser::addAssignment() {
+    ExprPtr expr(std::move(addOr()));
+
+    while(matchesOperators({TokenType::EQUAL})) {
+        TokenPtr op(new Token(tokens[cursor++]));
+        ExprPtr right(std::move(addOr()));
+        expr = std::make_unique<Expression>(std::move(expr), std::move(right), std::move(op));
+    }
+
+    return std::move(expr);
 }
 
 ExprPtr Parser::addOr() {
@@ -244,7 +251,7 @@ void Parser::print(Expression *root, int space)
 {  
     int COUNT = 10;
     // Base case  
-    if (root == NULL)  
+    if (root == nullptr)  
         return;  
   
     // Increase distance between levels  

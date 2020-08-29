@@ -71,4 +71,6 @@ class reference_t : public object {
         void* getValue() override;
 };
 
+typedef std::shared_ptr<object> ObjectPtr;
+
 #endif

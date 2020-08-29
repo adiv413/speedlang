@@ -5,6 +5,7 @@
 #include "expression.hpp"
 #include "error.hpp"
 #include "exceptions.hpp"
+#include "statement.hpp"
 #include <vector>
 #include <cmath>
 #include <unordered_map>
@@ -15,10 +16,7 @@ class Evaluator {
         typedef object (Evaluator::*BinaryFunc) (object *, object *);
 
     private:
-
-    //do type checking in the functions themselves, bc they pass objects anyway
-
-        std::vector<ExprPtr> *expressions;
+        std::vector<Statement> *statements;
         std::string filename;
         std::string contents;
         std::unique_ptr<Error> currentError;
@@ -57,6 +55,7 @@ class Evaluator {
             {TokenType::XOR, &op_xor}
         };
 
+        object evaluateStatement(Statement *stmt);
         object evaluateExpression(ExprPtr *expr);
         object evaluateUnary(Token *op, object operand); //TODO: when doing identifiers, take the token value (identifier name) and match that to an object via symbol table;
         object evaluateBinary(Token *op, object leftOperand, object rightOperand); //TODO: have switch case based on operator type and call helper functions for each operator type
@@ -90,8 +89,8 @@ class Evaluator {
         void addError(Token *t, std::string e_type, std::string e_desc);
 
     public:
-        Evaluator(std::vector<ExprPtr> *parser_owned_exprs, std::string file, std::string raw_contents) 
-        : expressions(parser_owned_exprs), filename(file), contents(raw_contents) {}
+        Evaluator(std::vector<Statement> *parser_owned_statements, std::string file, std::string raw_contents) 
+        : statements(parser_owned_statements), filename(file), contents(raw_contents) {}
         std::vector<object> evaluate();
 };
 
