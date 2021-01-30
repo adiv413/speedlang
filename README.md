@@ -1,2 +1,2 @@
-# speedlang
-Note: speedlang (and the .sp file extension) is a temporary name; actual name tbd
+# Vitesse
+Ultra-fast compiler for Vitesse, the dynamically-typed, high-level, general purpose programming language that emphasizes readability and ease-of-use without sacrificing speed.
